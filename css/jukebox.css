@@ -1,0 +1,179 @@
+.label-container {
+  padding-top: 8px;
+}
+
+label.input-type-file-label {
+  font-size: 14px;
+}
+
+input[type=password] {
+  width: 13em;
+  outline: 0;
+}
+
+input[type=file] {
+  display: none;
+}
+
+#message-ok {
+  color: green;
+}
+
+#message-error {
+  color: red;
+}
+
+.input-help {
+  font-size: 80%;
+  padding-top: 2px;
+  padding-left: 8px;
+}
+
+div.volume-button {
+  font-size: 150%;
+  font-weight: bold;
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.autosize {
+  width: 90%;
+  height: auto;
+  display: block;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+div.autosize {
+  height: 3.8em;
+  overflow: auto;
+}
+
+div[id^="play-list-div-"] {
+  line-height: 1.2em;
+  min-height: 2.5em;
+}
+
+#audio-vlc-options {
+  width: 20em;
+}
+
+.random-browse-lists {
+  border: 1px solid #ccc;
+}
+
+#lists-config-form .fieldset-label {
+  width: 90%;
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin: 1px;
+}
+
+#lists-config-form label.label-content-label {
+  width: 75%;
+  display: inline-block;
+  border: 5px dotted #ccc;
+  border-radius: 15px;
+  padding: 10px;
+  margin-left: 2px;
+}
+
+#lists-config-form label.label-content-label span {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+#internet-radio-config-form label,
+#lists-config-form label,
+#most-ordered-songs-form label {
+  display: block;
+}
+
+#internet-radio-search-form input[type=text] {
+  width: 24em;
+}
+#internet-radio-search-form select {
+  width: 25em;
+}
+
+fieldset.collapsible {
+  border: 0 none;
+  height: 8px;
+  overflow: hidden;
+  padding-left: 2px;
+  margin-left: 0;
+}
+@-moz-document url-prefix() {
+  fieldset.collapsible {
+    overflow: -moz-hidden-unscrollable;
+    padding: 2px;
+  }
+}
+fieldset.collapsible.expanded {
+  height: auto;
+}
+fieldset.collapsible > legend span {
+  height: 1.5em;
+  line-height: 1.5em;
+}
+fieldset.collapsible > legend span:last-child {
+  position: relative;
+  top: 0;
+  left: 40px;
+}
+fieldset.collapsible > legend span:first-child {
+  position: absolute;
+  background-color: #ded;
+  border-radius: 50%;
+  width: 1.5em;
+  text-align: center;
+}
+fieldset.collapsible.expanded > legend span:first-child {
+  position: absolute;
+  background-color: #eee;
+  border-radius: 50%;
+  width: 1.5em;
+  text-align: center;
+}
+fieldset.collapsible > legend {
+  cursor: pointer;
+}
+
+div.multiselect {
+  max-height: 20em;
+  /*border: 1px solid black;*/
+  overflow: auto;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: none;
+  overflow: auto;
+  z-index: 999;
+}
+.modal-view {
+  position: relative;
+  background-color: white;
+  width: 90%;
+  margin: 5% auto;
+  padding: 20px;
+}
+.modal-open {
+  display: block;
+}
+.modal-close {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 5%;
+  color: #999;
+  background-color: white;
+  cursor: pointer;
+  font-size: 300%;
+  z-index: 9999;
+}

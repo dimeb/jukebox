@@ -1,0 +1,167 @@
+{{define "lists"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Lists`}}";
+    var requestError = "{{.T.GetD `index` `Request error`}}";
+    var onlyFolderSelected = "{{.T.GetD `lists` `Only folder selected`}}";
+    var folderSongView = false;
+    var folderView = false;
+    var playSlot = '';
+    var playSong = ''
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="lists-config-form" method="post" action="/lists" onsubmit="submitLists();">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `lists` `Random list`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <p>{{.T.GetD `lists` `Random help`}}</p>
+            <p>
+            <div class="btn btn-sm" onclick="checkAll('random_list',true)">{{.T.GetD `index` `Select all`}}</div>
+            <div class="btn btn-sm" onclick="checkAll('random_list',false)">{{.T.GetD `index` `Deselect all`}}</div>
+            </p>
+            <p class="random-browse-lists">
+            <br/>
+            <div id="random-list" class="multiselect">
+            {{range .Data.Lists.RandomList -}}
+                <div><input type="checkbox" name="random_list" value="{{.}}">&nbsp;{{.}}</div>
+            {{end -}}
+            </div>
+            <br/>
+            </p>
+            <p>
+            <div class="btn btn-sm" data-target="modal-container" onclick="addFolderSong(this);">{{.T.GetD `lists` `Add folder song`}}</div>
+            <div class="btn btn-sm" onclick="deleteFolders('random-list');">{{.T.GetD `lists` `Delete folder song`}}</div>
+            </p>
+        </div>
+    </div>
+</fieldset>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            {{.T.GetD `lists` `Play list`}}
+        </div>
+    </div>
+{{range $slot, $active := .Data.Lists.ShowPlayList -}}
+    <div class="row">
+        <div class="col c12">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{$.T.GetD `lists` `Slot`}}&nbsp;{{Increment (Atoi $slot)}}</span></legend>
+    <br/>
+    <input type="checkbox" name="show_play_list" value="{{$slot}}" {{if $active}}checked{{end}} >&nbsp;{{$.T.GetD `lists` `Show`}}
+    <div class="row">
+{{range $i, $song := $.Data.PlayListSongsPerSlot}}
+{{$Song := index $.Data.Lists.PlayList $slot $song}}
+{{- if Mod $i 6 -}}
+    {{if gt $i 0}}
+        </div>
+    {{else}}
+        <br>
+    {{end}}
+        <div class="col c3">
+{{- end}}
+            <div><strong>{{Increment $i}}.</strong></div>
+            <div class="autosize" id="play-list-div-{{$slot}}-{{$song}}">{{$Song.File}}</div>
+<fieldset class="fieldset-label">
+    <legend>{{$.T.GetD `lists` `Label`}}</legend>
+        <label for="play-list-name-{{$slot}}-{{$song}}" class="input-help">{{$.T.GetD `lists` `Label name`}}</label>
+        <input type="text" class="autosize" id="play-list-name-{{$slot}}-{{$song}}" name="play_list_name_{{$slot}}_{{$song}}" value="{{$Song.Name}}" />
+        <label for="play-list-author-{{$slot}}-{{$song}}" class="input-help">{{$.T.GetD `lists` `Label author`}}</label>
+        <input type="text" class="autosize" id="play-list-author-{{$slot}}-{{$song}}" name="play_list_author_{{$slot}}_{{$song}}" value="{{$Song.Author}}" />
+</fieldset>
+            <input type="hidden" id="play-list-file-{{$slot}}-{{$song}}" name="play_list_file_{{$slot}}_{{$song}}" value="{{$Song.File}}" />
+            <div class="btn btn-sm" data-target="modal-container" onclick="setSong(this,'{{$slot}}','{{$song}}');">{{$.T.GetD `lists` `Set song`}}</div>
+            <div class="btn btn-sm" onclick="deleteSong('{{$slot}}','{{$song}}');">{{$.T.GetD `lists` `Delete song`}}</div>
+{{- end}}
+    </div>
+</fieldset>
+        </div>
+    </div>
+{{- end}}
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `lists` `Label format`}}</span></legend>
+    <div class="row">
+{{range $i, $option := .Data.LabelContentOptions -}}
+{{if or (eq $i 3) (eq $i 6) (eq $i 9) (eq $i 12) (eq $i 15) -}}
+    </div>
+    <div class="row" style="margin-top:0;">
+{{- end}}
+        <div class="col c4">
+            <input type="radio" id="label-content-input-{{$option}}" name="label_content" value="{{$option}}" {{if eq $.Data.Lists.LabelContent $option}}checked{{end}} />
+            <label for="label-content-input-{{$option}}" class="label-content-label" data-format="{{$option}}">{{if lt $i 9}}{{HTMLString ($.T.GetD `lists` `Name author`)}}{{else}}{{HTMLString ($.T.GetD `lists` `Author name`)}}{{end}}</label>
+        </div>
+{{- end}}
+    </div>
+</fieldset>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `lists` `Browse list`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <p>{{.T.GetD `lists` `Browse help`}}</p>
+            <p>
+            <div class="btn btn-sm" onclick="checkAll('browse_list',true)">{{.T.GetD `index` `Select all`}}</div>
+            <div class="btn btn-sm" onclick="checkAll('browse_list',false)">{{.T.GetD `index` `Deselect all`}}</div>
+            </p>
+            <p class="random-browse-lists">
+            <br/>
+            <div id="browse-list" class="multiselect" style="max-height:none;">
+            {{range .Data.Lists.BrowseList -}}
+                <div><input type="checkbox" name="browse_list" value="{{.}}">&nbsp;{{.}}</div>
+            {{end -}}
+            </div>
+            <br/>
+            </p>
+            <p>
+            <div class="btn btn-sm" data-target="modal-container" onclick="addFolder(this);">{{.T.GetD `lists` `Add folder`}}</div>
+            <div class="btn btn-sm" onclick="deleteFolders('browse-list');">{{.T.GetD `lists` `Delete folder`}}</div>
+            </p>
+        </div>
+    </div>
+</fieldset>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="lists-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+</form>
+</div>
+<br>
+<div id="modal-container" class="modal">
+<span id="modal-container-close" class="modal-close" data-target="modal-container" onclick="toggleModal(this);">&otimes;</span>
+<div id="song-search-div">
+<form id="song-search-form" method="post" action="/nowhere">
+    <label for="song-search-input" style="display:inline-block;">{{.T.GetD `lists` `Search song`}}</label>
+    <input type="text" id="song-search-input" name="search_song" value="" style="display:inline-block;" />
+    <div class="btn btn-sm" onclick="clearSearchSong();">{{.T.GetD `index` `Clear`}}</div>
+</form>
+<div id="song-search-result-div"></div>
+<hr>
+</div>
+<div id="tree-view" class="modal-view"></div>
+</div>
+<script src="/js/tree_view.js?v={{.JSV}}"></script>
+<script src="/js/lists.js?v={{.JSV}}"></script>
+{{end}}

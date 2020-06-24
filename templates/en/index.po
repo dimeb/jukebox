@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Jukebox"
+msgstr "Jukebox!"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Lists"
+msgstr "Lists"
+
+msgid "Internet radio"
+msgstr "Internet radio"
+
+msgid "Setup"
+msgstr "Configuration"
+
+msgid "Skin"
+msgstr "Skin"
+
+msgid "Logs"
+msgstr "Logs"
+
+msgid "Submit"
+msgstr "Save"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Refresh"
+msgstr "Refresh"
+
+msgid "Choose file"
+msgstr "Choose file"
+
+msgid "No file chosen"
+msgstr "No file chosen"
+
+msgid "Maximum file size"
+msgstr "Maximum file size"
+
+msgid "File is greater"
+msgstr "File size is greater then allowed"
+
+msgid "Allowed characters username"
+msgstr "Allowed: alphanumerics and underscores."
+
+msgid "Allowed characters filename"
+msgstr "Allowed: alphanumerics, underscores and periods."
+
+msgid "Are you sure"
+msgstr "Are you sure?"
+
+msgid "Request queued"
+msgstr "Request queued for execution"
+
+msgid "Request error"
+msgstr "Request error with code "
+
+msgid "Select all"
+msgstr "Select all"
+
+msgid "Deselect all"
+msgstr "Deselect all"
+
+msgid "Unspecified"
+msgstr "Unspecified"
+
+msgid "Error saving data please try again"
+msgstr "Error saving data. Please try again."
+
+msgid "Configuration changed"
+msgstr "Configuration changed."
+
+msgid "Clear"
+msgstr "Clear"

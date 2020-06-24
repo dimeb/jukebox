@@ -1,0 +1,43 @@
+ul {
+  list-style: none;
+  padding-left: 1.75em;
+}
+
+ul li {
+  border-bottom-left-radius: .75em;
+  border-top-left-radius: .75em;
+  margin: 2px 0;
+  position: relative;
+}
+
+ul li a {
+  background-color: #eee;
+  border-radius: 50%;
+  color: #000;
+  display: inline-block;
+  height: 1.5em;
+  left: -1.5em;
+  line-height: 1.5em;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  width: 1.5em;
+}
+
+ul li a.plus {
+  background-color: #ded;
+}
+
+ul li a.minus {
+  background-color: #eee;
+}
+
+ul li a:active {
+  top: 1px;
+}
+
+ul li span {
+  display: inline-block;
+  margin: .25em .5em;
+}
+

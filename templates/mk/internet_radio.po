@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Station search"
+msgstr "Пребарување на станици"
+
+msgid "Name"
+msgstr "Име"
+
+msgid "Country"
+msgstr "Држава"
+
+msgid "Genre"
+msgstr "Жанр"
+
+msgid "Language"
+msgstr "Јазик"
+
+msgid "Selected station"
+msgstr "Избрана станица"
+
+msgid "Delete selected station"
+msgstr "Избриши ја избраната станица"
+
+msgid "Cannot delete selected station"
+msgstr "Избраната станица не може да се избрише, прво сменете го изворот на позадинска музика"
+
+msgid "Internet radio database inaccessible"
+msgstr "Базата на интернет радија е непристапна, ве молиме обидете се повторно подоцна."
+
+msgid "Internet radio download URL"
+msgstr "URL на базата со интернет радија"
+
+msgid "Internet radio database update"
+msgstr "Симни ја базата и ажурирај ја локалната база"
+
+msgid "Last download"
+msgstr "Последно симнување: %s"
+
+msgid "Invalid download URL"
+msgstr "Неисправен URL за симнување на базата \"%s\"."
+

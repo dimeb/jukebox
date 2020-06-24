@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>APP</title>
+
+        <link href="/css/app.css" rel="stylesheet" type="text/css" />
+
+        <style>
+.label-selected > div {
+    border-radius: 15px;
+}
+.label-actions > div > div {
+    border-radius: 15px;
+}
+.body > div:nth-child(odd) {
+    border-radius: 15px 0 0 15px;
+}
+.body > div:nth-child(even) {
+    border-radius: 0 15px 15px 0;
+}
+        </style>
+        <script>
+var skin = 'skin_default';
+
+function skinUsageText() {
+  return screenData.UsageText;
+}
+
+function skinSetUsage() {
+    return;
+}
+
+function skinBodyInit() {
+    return;
+}
+
+function skinInit() {
+    for (var i = 0; i < buttonCodes.length; i++) {
+        const chr = buttonCodes.substring(i, i + 1);
+        document.getElementById('button-'+chr).addEventListener('click', function(event) {
+            songSelection(chr);
+        });
+    }
+}
+        </script>
+    </head>
+    <body>
+        <div class="table header">
+            <div class="button-usage"><img id="icon-usage" src="/img/icon_usage_blank.svg"></div><div class="label-usage"><div><div id="label-usage-text"></div></div></div>
+            <div class="label-selected"><div><div id="label-selected-text"></div><div id="label-selected-selection"></div></div></div>
+            <div class="label-actions"><div><div id="button-cancel-text"></div><div id="button-play-text"></div></div></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-a" src="/img/skin_default/button1.svg"></div><div class="label"><div><div id="label-top-a"></div></div><div><div id="label-bottom-a"></div></div></div>
+            <div class="button"><img id="button-g" src="/img/skin_default/button7.svg"></div><div class="label"><div><div id="label-top-g"></div></div><div><div id="label-bottom-g"></div></div></div>
+            <div class="label"><div><div id="label-top-m"></div></div><div><div id="label-bottom-m"></div></div></div><div class="button"><img id="button-m" src="/img/skin_default/button13.svg"></div>
+            <div class="label"><div><div id="label-top-s"></div></div><div><div id="label-bottom-s"></div></div></div><div class="button"><img id="button-s" src="/img/skin_default/button19.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-b" src="/img/skin_default/button2.svg"></div><div class="label"><div><div id="label-top-b"></div></div><div><div id="label-bottom-b"></div></div></div>
+            <div class="button"><img id="button-h" src="/img/skin_default/button8.svg"></div><div class="label"><div><div id="label-top-h"></div></div><div><div id="label-bottom-h"></div></div></div>
+            <div class="label"><div><div id="label-top-n"></div></div><div><div id="label-bottom-n"></div></div></div><div class="button"><img id="button-n" src="/img/skin_default/button14.svg"></div>
+            <div class="label"><div><div id="label-top-t"></div></div><div><div id="label-bottom-t"></div></div></div><div class="button"><img id="button-t" src="/img/skin_default/button20.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-c" src="/img/skin_default/button3.svg"></div><div class="label"><div><div id="label-top-c"></div></div><div><div id="label-bottom-c"></div></div></div>
+            <div class="button"><img id="button-i" src="/img/skin_default/button9.svg"></div><div class="label"><div><div id="label-top-i"></div></div><div><div id="label-bottom-i"></div></div></div>
+            <div class="label"><div><div id="label-top-o"></div></div><div><div id="label-bottom-o"></div></div></div><div class="button"><img id="button-o" src="/img/skin_default/button15.svg"></div>
+            <div class="label"><div><div id="label-top-u"></div></div><div><div id="label-bottom-u"></div></div></div><div class="button"><img id="button-u" src="/img/skin_default/button21.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-d" src="/img/skin_default/button4.svg"></div><div class="label"><div><div id="label-top-d"></div></div><div><div id="label-bottom-d"></div></div></div>
+            <div class="button"><img id="button-j" src="/img/skin_default/button10.svg"></div><div class="label"><div><div id="label-top-j"></div></div><div><div id="label-bottom-j"></div></div></div>
+            <div class="label"><div><div id="label-top-p"></div></div><div><div id="label-bottom-p"></div></div></div><div class="button"><img id="button-p" src="/img/skin_default/button16.svg"></div>
+            <div class="label"><div><div id="label-top-v"></div></div><div><div id="label-bottom-v"></div></div></div><div class="button"><img id="button-v" src="/img/skin_default/button22.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-e" src="/img/skin_default/button5.svg"></div><div class="label"><div><div id="label-top-e"></div></div><div><div id="label-bottom-e"></div></div></div>
+            <div class="button"><img id="button-k" src="/img/skin_default/button11.svg"></div><div class="label"><div><div id="label-top-k"></div></div><div><div id="label-bottom-k"></div></div></div>
+            <div class="label"><div><div id="label-top-q"></div></div><div><div id="label-bottom-q"></div></div></div><div class="button"><img id="button-q" src="/img/skin_default/button17.svg"></div>
+            <div class="label"><div><div id="label-top-w"></div></div><div><div id="label-bottom-w"></div></div></div><div class="button"><img id="button-w" src="/img/skin_default/button23.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-f" src="/img/skin_default/button6.svg"></div><div class="label"><div><div id="label-top-f"></div></div><div><div id="label-bottom-f"></div></div></div>
+            <div class="button"><img id="button-l" src="/img/skin_default/button12.svg"></div><div class="label"><div><div id="label-top-l"></div></div><div><div id="label-bottom-l"></div></div></div>
+            <div class="label"><div><div id="label-top-r"></div></div><div><div id="label-bottom-r"></div></div></div><div class="button"><img id="button-r" src="/img/skin_default/button18.svg"></div>
+            <div class="label"><div><div id="label-top-x"></div></div><div><div id="label-bottom-x"></div></div></div><div class="button"><img id="button-x" src="/img/skin_default/button24.svg"></div>
+        </div>
+        <div id="play-list-selector" class="table footer"></div>
+        <script src="/js/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,120 @@
+{{define "internet_radio"}}
+{{$unspecified := (.T.GetD `index` `Unspecified`)}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Internet radio`}}";
+    var requestError = "{{.T.GetD `index` `Request error`}}";
+    var unspecified = "{{.T.GetD `index` `Unspecified`}}";
+    var dbUpdateConfirm = "{{.T.GetD `index` `Are you sure`}}";
+    var dbUpdateRequestSent = "{{.T.GetD `index` `Request queued`}}";
+    var dbUpdateRequestError = "{{.T.GetD `index` `Request error`}}";
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="internet-radio-config-form" method="post" action="/internet_radio">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `index` `Setup`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <label for="internet-radio-download-url">{{.T.GetD `internet_radio` `Internet radio download URL`}}</label>
+            <input type="text" id="internet-radio-download-url" class="autosize" name="download_url" value="{{.Data.Cfg.InternetRadioDownloadURL}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="btn btn-sm" id="internet-radio-database-update">{{.T.GetD `internet_radio` `Internet radio database update`}}</div>
+            <div class="input-help">{{.Data.LastDownload}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div>{{.T.GetD `internet_radio` `Selected station`}}</div>
+            <textarea id="internet-radio-selected-name" class="autosize" name="selected_name" readonly>{{.Data.Cfg.InternetRadioSelectedName}}</textarea>
+            <input type="hidden" id="internet-radio-selected-url" name="selected_url" value="{{.Data.Cfg.InternetRadioSelectedURL}}" />
+        </div>
+    </div>
+{{if ne .Data.Cfg.BackgroundMusic `internet radio`}}
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="internet-radio-selected-url-delete-button" name="internet_radio_selected_url_delete" value="{{.T.GetD `internet_radio` `Delete selected station`}}" />
+            <input type="hidden" id="internet-radio-selected-url-delete" name="selected_url_delete" value="0" />
+        </div>
+    </div>
+{{end}}
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="internet-radio-download-url-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+</fieldset>
+</form>
+<form id="internet-radio-search-form" method="post" action="/internet_radio_search">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `internet_radio` `Station search`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <label for="internet-radio-search-name">{{.T.GetD `internet_radio` `Name`}}</label>
+            <input type="text" id="internet-radio-search-name" name="search_name" value="" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c4 label-container">
+            <fieldset class="multiselect">
+            <legend>{{.T.GetD `internet_radio` `Country`}}</legend>
+            <p>
+            <div class="btn btn-sm" onclick="checkAll('search_country',true)">{{.T.GetD `index` `Select all`}}</div>
+            <div class="btn btn-sm" onclick="checkAll('search_country',false)">{{.T.GetD `index` `Deselect all`}}</div>
+            </p>
+            <div class="multiselect">
+            {{range $k, $v := .Data.Countries}}<div><input type="checkbox" name="search_country" value="{{$k}}"><label for="{{$k}}">&nbsp;{{if eq $k `--`}}{{$unspecified}}{{else}}{{$k}} - {{$v}}{{end}}  </label></div>{{end}}
+            </div>
+            </fieldset>
+        </div>
+        <div class="col c4 label-container">
+            <fieldset class="multiselect">
+            <legend>{{.T.GetD `internet_radio` `Genre`}}</legend>
+            <p>
+            <div class="btn btn-sm" onclick="checkAll('search_tag',true)">{{.T.GetD `index` `Select all`}}</div>
+            <div class="btn btn-sm" onclick="checkAll('search_tag',false)">{{.T.GetD `index` `Deselect all`}}</div>
+            </p>
+            <div class="multiselect">
+            {{range .Data.Tags}}{{$words := StringsSplit . ` `}}{{$tag := StringsJoin (slice $words 0 (Decrement (len $words))) ` `}}<div><input type="checkbox" name="search_tag" value="{{$tag}}"><label for="{{$tag}}">&nbsp;{{.}}</label></div>{{end}}
+            </div>
+            </fieldset>
+        </div>
+        <div class="col c4 label-container">
+            <fieldset class="multiselect">
+            <legend>{{.T.GetD `internet_radio` `Language`}}</legend>
+            <p>
+            <div class="btn btn-sm" onclick="checkAll('search_language',true)">{{.T.GetD `index` `Select all`}}</div>
+            <div class="btn btn-sm" onclick="checkAll('search_language',false)">{{.T.GetD `index` `Deselect all`}}</div>
+            </p>
+            <div class="multiselect">
+            {{range $k, $v := .Data.Languages}}<div><input type="checkbox" name="search_language" value="{{$k}}"><label for="{{$k}}">&nbsp;{{$k}}{{if ne `-` $k}} ({{$v}}){{end}}</label></div>{{end}}
+            </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="internet-radio-search-button" name="search" value="{{.T.GetD `index` `Search`}}" />
+        </div>
+    </div>
+</fieldset>
+</form>
+    <div class="row">
+        <div class="col c12"><div id="tree-view"></div></div>
+    </div>
+</div>
+<br>
+<script src="/js/tree_view.js?v={{.JSV}}"></script>
+<script src="/js/internet_radio.js?v={{.JSV}}"></script>
+{{end}}

@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "VLC options"
+msgstr "Опции за VLC (*)"
+
+msgid "VLC options tip"
+msgstr "Една опција по линија"
+
+msgid "VLC options tip1"
+msgstr "(*) За да се прифатат промените џубоксот мора да се рестартира"
+
+msgid "Initial audio volume"
+msgstr "Иницијална јачина на звукот кога џубоксот ќе се вклучи (**)"
+
+msgid "Audio volume"
+msgstr "(**) Софтверска јачина на звук, нула или позитивен цел број во проценти (0 = исклучено, 100 = 0dB)"
+
+msgid "Volume step"
+msgstr "Чекор на јачината"
+
+msgid "Volume step tip"
+msgstr "Позитивен цел број во проценти"
+
+msgid "Play list volume"
+msgstr "Јачина на избраната музика"
+
+msgid "Play list volume tip"
+msgstr "Нула или позитивен цел број во проценти"
+
+msgid "Random list volume"
+msgstr "Јачина на позадинската музика"
+
+msgid "Random list volume tip"
+msgstr "Нула или позитивен цел број во проценти"
+
+msgid "Internet radio volume"
+msgstr "Јачина на интернет радиото"
+
+msgid "Internet radio volume tip"
+msgstr "Нула или позитивен цел број во проценти"
+
+msgid "Invalid volume step"
+msgstr "Неисправен чекор на јачината \"%s\"."
+
+msgid "Invalid play list volume"
+msgstr "Неисправна јачина на избраната музика \"%s\"."
+
+msgid "Invalid random list volume"
+msgstr "Неисправна јачина на позадинската музика \"%s\"."
+
+msgid "Invalid radio volume"
+msgstr "Неисправна јачина на интернет радиото \"%s\"."
+
+msgid "Current audio volume"
+msgstr "Тековна јачина на звукот"
+
+msgid "Save audio volume"
+msgstr "Зачувај ја како иницијална јачина"

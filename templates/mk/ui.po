@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Error"
+msgstr "ГРЕШКА !!!"
+
+msgid "Change list"
+msgstr "Смени листа"
+
+msgid "Usage"
+msgstr "Притисни на бројките<br>за да избереш песна"
+
+msgid "Usage song"
+msgstr "Притисни на песната<br>за да ја избереш"
+
+msgid "Usage icon"
+msgstr "Притисни на иконата<br>за да ја видиш сликата"
+
+msgid "Song selected"
+msgstr "Избор:"
+
+msgid "Songs"
+msgstr "песни"
+
+msgid "Cancel"
+msgstr "Откажи"
+
+msgid "Play"
+msgstr "Свири"
+
+msgid "Chip"
+msgstr "Внеси жетон"
+
+msgid "Money"
+msgstr "Внеси пари"
+

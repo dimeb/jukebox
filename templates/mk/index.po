@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Jukebox"
+msgstr "Џубокс!"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Lists"
+msgstr "Листи"
+
+msgid "Internet radio"
+msgstr "Интернет радио"
+
+msgid "Setup"
+msgstr "Конфигурација"
+
+msgid "Skin"
+msgstr "Изглед"
+
+msgid "Logs"
+msgstr "Логови"
+
+msgid "Submit"
+msgstr "Зачувај"
+
+msgid "Search"
+msgstr "Пребарај"
+
+msgid "Refresh"
+msgstr "Освежи"
+
+msgid "Choose file"
+msgstr "Избери фајл"
+
+msgid "No file chosen"
+msgstr "Нема избрано фајл"
+
+msgid "Maximum file size"
+msgstr "Максимална големина на фајлот"
+
+msgid "File is greater"
+msgstr "Големината на фајлот е поголема од дозволената"
+
+msgid "Allowed characters username"
+msgstr "Дозволени: алфанумерици и подцрти."
+
+msgid "Allowed characters filename"
+msgstr "Дозволени: алфанумерици, подцрти и точки."
+
+msgid "Are you sure"
+msgstr "Дали сте сигурни?"
+
+msgid "Request queued"
+msgstr "Барањето е прифатено"
+
+msgid "Request error"
+msgstr "Грешка со код "
+
+msgid "Select all"
+msgstr "Вклучи ги сите"
+
+msgid "Deselect all"
+msgstr "Исклучи ги сите"
+
+msgid "Unspecified"
+msgstr "Неспецифицирано"
+
+msgid "Error saving data please try again"
+msgstr "Грешка при внесот на податоците. Ве молиме обидете се повторно."
+
+msgid "Configuration changed"
+msgstr "Конфигурацијата е сменета."
+
+msgid "Clear"
+msgstr "Исчисти"

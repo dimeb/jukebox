@@ -1,0 +1,36 @@
+{{define "skin"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Skin`}}";
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            {{.T.GetD `skin` `Jukebox skin`}}
+        </div>
+    </div>
+<form id="skin-config-form" method="post" action="/skin">
+{{range .Data.Skins -}}
+    <div class="row">
+        <div class="col c12">
+            <input type="radio" name="skin" value="{{.}}" {{if eq $.Data.Skin .}}checked{{end}} />&nbsp;{{.}}
+        </div>
+    </div>
+{{- end}}
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="skin-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+</form>
+</div>
+{{end}}

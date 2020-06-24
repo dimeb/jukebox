@@ -1,0 +1,112 @@
+{{define "audio"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Audio`}}";
+    var requestError = "{{.T.GetD `index` `Request error`}}";
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="audio-config-form" method="post" action="/audio">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `index` `Setup`}}</span></legend>
+    <div class="row">
+        <div class="col c3 label-container">
+            <label for="audio-vlc-options">{{.T.GetD `audio` `VLC options`}}</label>
+        </div>
+        <div class="col c9">
+            <textarea id="audio-vlc-options" name="vlc_options" rows="4" cols="50">{{SliceToText .Data.Cfg.VLCOptions}}</textarea>
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `VLC options tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="input-help">{{.T.GetD `audio` `VLC options tip1`}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            {{HTMLString (.T.GetD `audio` `Initial audio volume`)}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c3 label-container">
+            <label for="audio-volume-step">{{.T.GetD `audio` `Volume step`}}</label>
+        </div>
+        <div class="col c9">
+            <input type="text" id="audio-volume-step" name="volume_step" value="{{.Data.Cfg.VolumeStep}}" />
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `Volume step tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c3 label-container">
+            <label for="audio-play-list-volume">{{.T.GetD `audio` `Play list volume`}}</label>
+        </div>
+        <div class="col c9">
+            <input type="text" id="audio-play-list-volume" name="play_list_volume" value="{{.Data.Cfg.PlayListVolume}}" />
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `Play list volume tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c3 label-container">
+            <label for="audio-random-list-volume">{{.T.GetD `audio` `Random list volume`}}</label>
+        </div>
+        <div class="col c9">
+            <input type="text" id="audio-random-list-volume" name="random_list_volume" value="{{.Data.Cfg.RandomListVolume}}" />
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `Random list volume tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c3 label-container">
+            <label for="audio-internet-radio-volume">{{.T.GetD `audio` `Internet radio volume`}}</label>
+        </div>
+        <div class="col c9">
+            <input type="text" id="audio-internet-radio-volume" name="internet_radio_volume" value="{{.Data.Cfg.InternetRadioVolume}}" />
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `Internet radio volume tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="input-help">{{HTMLString (.T.GetD `audio` `Audio volume`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="audio-config-submit-button" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+</fieldset>
+</form>
+<form id="audio-volume-form" method="post" action="/audio_volume">
+    <div class="row">
+        <div class="col c12">
+            {{.T.GetD `audio` `Current audio volume`}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="btn btn-sm volume-button" onclick="setVolume('audio_volume_plus')">&plus;</div>
+            <div class="btn btn-sm volume-button" onclick="setVolume('audio_volume_minus')">&minus;</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="audio-volume-submit-button" name="submit" value="{{.T.GetD `audio` `Save audio volume`}}" />
+            <input type="hidden" id="audio-volume-value" data-init="save" name="audio_volume_value" value="save" />
+        </div>
+    </div>
+</form>
+<script src="/js/audio.js?v={{.JSV}}"></script>
+{{end}}

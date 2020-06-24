@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>APP</title>
+ 
+        <link href="/css/app.css" rel="stylesheet" type="text/css" />
+
+        <style>
+.browse-container {
+  background-image: url("../img/stars.png");
+  width: 100%;
+  height: 87.5%;
+  border: 2px solid white;
+  overflow: auto;
+}
+.browse-container > div {
+  background-color: transparent;
+  margin: 2em;
+  font-size: 3vh;
+}
+/*
+ * Tree view
+ */
+ul {
+  list-style: none;
+  padding-left: 1.75em;
+}
+ul li {
+  margin: 1.5em 0;
+  position: relative;
+}
+ul li a {
+  color: white;
+  display: inline-block;
+  left: -1em;
+  margin: .25em .5em;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  cursor: default;
+}
+ul li a:active {
+  top: 1px;
+}
+ul li span {
+  display: inline-block;
+  margin: .25em .5em;
+}
+        </style>
+
+        <script>
+var skin = 'skin_browser';
+var browseContainer = null;
+var browsePosition = {top: 0, left: 0, x: 0, y: 0};
+
+const mouseMoveHandler = function(event) {
+    // How far the mouse has been moved
+    const dx = event.clientX - browsePosition.x;
+    const dy = event.clientY - browsePosition.y;
+
+    // Scroll the element
+    browseContainer.scrollTop = browsePosition.top - dy;
+    browseContainer.scrollLeft = browsePosition.left - dx;
+};
+
+const mouseUpHandler = function() {
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+};
+
+function skinUsageText() {
+  return screenData.UsageSongText;
+}
+
+function skinSetUsage() {
+    return;
+}
+
+function skinBodyInit() {
+    document.getElementById('tree-view').innerHTML = '';
+    addOrphans('#tree-view');
+}
+
+function skinInit() {
+    browseContainer = document.getElementById('browse-container-id');
+    browseContainer.addEventListener('mousedown', function(event) {
+        browsePosition = {
+            left: browseContainer.scrollLeft,
+            top: browseContainer.scrollTop,
+            x: event.clientX,
+            y: event.clientY,
+        };
+
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    });
+}
+
+function spanClick() {
+    var file = this.getAttribute('data-name');
+    var p = this.getAttribute('data-file');
+    if (p != '.') {
+        file = p + '/' + file;
+    }
+    let isFolder = '0';
+    if (this.hasAttribute('data-folder')) {
+        isFolder = this.getAttribute('data-folder');
+    }
+    if (isFolder == '1') {
+        this.previousSibling.click();
+        return;
+    }
+    if (canSelect > 0) {
+        if (canSelect <= playData.length) {
+            playData.shift();
+        }
+        playData.push(file);
+        const elem = document.getElementById('label-selected-selection');
+        elem.innerHTML = '';
+        const elemWidth = elem.clientWidth;
+        playData.forEach(function(val, idx) {
+            const l = playData.length - 1;
+            elem.innerHTML += val.replace(/\..+$/, '');
+            if (idx < l) {
+                elem.innerHTML += '<br>';
+            }
+        });
+        textFit(elem, elemWidth);
+    } else {
+        coinAlert();
+    }
+}
+        </script>
+    </head>
+    <body>
+        <div class="table header">
+            <div class="button-usage"><img id="icon-usage" src="/img/icon_usage_blank.svg"></div><div class="label-usage"><div><div id="label-usage-text"></div></div></div>
+            <div class="label-selected"><div><div id="label-selected-text"></div><div id="label-selected-selection"></div></div></div>
+            <div class="label-actions"><div><div id="button-cancel-text"></div><div id="button-play-text"></div></div></div>
+        </div>
+        <div id="browse-container-id" class="browse-container"><div id="tree-view"></div></div>
+        <script src="/js/tree_view.js"></script>
+        <script src="/js/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Random list"
+msgstr "List of folders/songs for random background music"
+
+msgid "Random help"
+msgstr "If empty random background music shall be selected from all folders"
+
+msgid "Add folder song"
+msgstr "Add folder/song"
+
+msgid "Delete folder song"
+msgstr "Delete selected folders/songs"
+
+msgid "Play list"
+msgstr "List of songs to choose from"
+
+msgid "Slot"
+msgstr "List"
+
+msgid "Show"
+msgstr "Show on screen"
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Label name"
+msgstr "Song name"
+
+msgid "Label author"
+msgstr "Song author"
+
+msgid "Set song"
+msgstr "Set song"
+
+msgid "Delete song"
+msgstr "Delete song"
+
+msgid "Label format"
+msgstr "Label format"
+
+msgid "Name author"
+msgstr "<span>Song name</span><br><span>Song author</span>"
+
+msgid "Author name"
+msgstr "<span>Song author</span><br><span>Song name</span>"
+
+msgid "Search song"
+msgstr "Search song"
+
+msgid "Browse list"
+msgstr "List for browse selection"
+
+msgid "Add folder"
+msgstr "Add folder"
+
+msgid "Delete folder"
+msgstr "Delete selected folders"
+
+msgid "Only folder selected"
+msgstr "Only folder may be selected"
+
+msgid "Browse help"
+msgstr "If empty all folders shall be browsed"

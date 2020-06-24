@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Current password"
+msgstr "Current password"
+
+msgid "New password"
+msgstr "New password"
+
+msgid "Confirm new password"
+msgstr "Confirm new password"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "HTTP address"
+msgstr "HTTP listen addresses"
+
+msgid "HTTPS address"
+msgstr "HTTPS listen addresses"
+
+msgid "HTTP address tip"
+msgstr "One address per line<br>Syntax: \"address:port\"<br>Example: \"127.0.0.1:9090\"<br>To listen on all addresses: \":9090\"<br>Disabled if empty<br><strong>Port 10000 is reserved!</strong>"
+
+msgid "TLS cert file"
+msgstr "TLS certificate file"
+
+msgid "Error saving TLS cert file"
+msgstr "Error saving TLS certificate file \"%s\"."
+
+msgid "TLS key file"
+msgstr "TLS key file"
+
+msgid "Error saving TLS key file"
+msgstr "Error saving TLS key file \"%s\"."
+
+msgid "Empty or invalid username"
+msgstr "Empty or invalid username \"%s\"."
+
+msgid "Invalid current password"
+msgstr "Invalid current password."
+
+msgid "New password and Confirm new password doesn't match"
+msgstr "New password and Confirm new password doesn't match."
+
+msgid "Invalid HTTP address"
+msgstr "Invalid HTTP address(es) %v."
+
+msgid "Invalid HTTPS address"
+msgstr "Invalid HTTPS address(es) %v."
+
+msgid "BGMusic"
+msgstr "Background music source"
+
+msgid "BGMusic source list"
+msgstr "Background music list"
+
+msgid "BGMusic source internet radio"
+msgstr "Internet radio"
+
+msgid "Free songs selection"
+msgstr "Free songs selection"
+

@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Error"
+msgstr "ERROR !!!"
+
+msgid "Change list"
+msgstr "Change list"
+
+msgid "Usage"
+msgstr "Tap on numbers<br>to choose a song"
+
+msgid "Usage song"
+msgstr "Tap on song<br>to choose it"
+
+msgid "Usage icon"
+msgstr "Tap on icon<br>to see the image"
+
+msgid "Song selected"
+msgstr "Selected:"
+
+msgid "Songs"
+msgstr "songs"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Play"
+msgstr "Play"
+
+msgid "Chip"
+msgstr "Insert chip"
+
+msgid "Money"
+msgstr "Insert money"
+

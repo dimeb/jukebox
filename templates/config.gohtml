@@ -1,0 +1,146 @@
+{{define "config"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Setup`}}";
+</script>
+<div class="container">
+<form enctype="multipart/form-data" id="config-form" method="post" action="/config">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-username">{{.T.GetD `config` `Username`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="text" id="config-username" name="username" value="{{.Data.Cfg.WebAdminUsername}}" />
+            <div class="input-help">{{.T.GetD `index` `Allowed characters username`}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-old-password">{{.T.GetD `config` `Current password`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="password" id="config-old-password" name="old_password" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-new-password">{{.T.GetD `config` `New password`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="password" id="config-new-password" name="new_password" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-confirm-new-password">{{.T.GetD `config` `Confirm new password`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="password" id="config-confirm-new-password" name="confirm_new_password" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-language">{{.T.GetD `config` `Language`}}</label>
+        </div>
+        <div class="col c10">
+            <select id="config-language" name="language">
+            {{range .Data.Languages}}
+                <option value="{{.}}" {{if eq . $.Data.Cfg.WebAdminLanguage}}selected{{end}}>{{.}}</option>
+            {{end}}
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-http-address">{{.T.GetD `config` `HTTP address`}}</label>
+        </div>
+        <div class="col c10">
+            <textarea id="config-http-address" name="http_address" rows="4" cols="25">{{SliceToText .Data.Cfg.WebAdminHTTPAddress}}</textarea>
+            <div class="input-help">{{HTMLString (.T.GetD `config` `HTTP address tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-https-address">{{.T.GetD `config` `HTTPS address`}}</label>
+        </div>
+        <div class="col c10">
+            <textarea id="config-https-address" name="https_address" rows="4" cols="25">{{SliceToText .Data.Cfg.WebAdminHTTPSAddress}}</textarea>
+            <div class="input-help">{{HTMLString (.T.GetD `config` `HTTP address tip`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label>{{.T.GetD `config` `TLS cert file`}}</label>
+        </div>
+        <div class="col c10">
+            <div id="config-tls-cert-file-button" class="btn btn-sm input-type-file-button">{{.T.GetD `index` `Choose file`}}</div>
+            <label id="config-tls-cert-file-label" class="input-type-file-label" data-text="{{.T.GetD `index` `No file chosen`}}"></label>
+            <input type="file" id="config-tls-cert-file-file" class="input-type-file-file" name="tls_cert_file" accept="*" data-maxsize="2048" />
+            <div class="input-help">{{.T.GetD `index` `Maximum file size`}} 2KB</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label>{{.T.GetD `config` `TLS key file`}}</label>
+        </div>
+        <div class="col c10">
+            <div id="config-tls-key-file-button" class="btn btn-sm input-type-file-button">{{.T.GetD `index` `Choose file`}}</div>
+            <label id="config-tls-key-file-label" class="input-type-file-label" data-text="{{.T.GetD `index` `No file chosen`}}"></label>
+            <input type="file" id="config-tls-key-file-file" class="input-type-file-file" name="tls_key_file" accept="*" data-maxsize="2048" />
+            <div class="input-help">{{.T.GetD `index` `Maximum file size`}} 2KB</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="config-background-music">{{.T.GetD `config` `BGMusic`}}</label>
+        </div>
+        <div class="col c10">
+            <select id="config-background-music" name="background_music">
+            {{range $k, $v := .Data.BackgroundMusicSource}}
+                <option value="{{$k}}" {{if eq $k $.Data.Cfg.BackgroundMusic}}selected{{end}}>{{$.T.GetD `config` $v}}</option>
+            {{end}}
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2">
+            <label for="config-free-songs-selection">{{.T.GetD `config` `Free songs selection`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="checkbox" id="config-free-songs-selection" name="free_songs_selection" {{if eq .Data.Cfg.FreeSongsSelection 1}}checked{{end}} />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2">&nbsp;</div>
+        <div class="col c10">
+            <input type="submit" class="btn btn-sm" id="config-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+</form>
+</div>
+<br>
+{{end}}

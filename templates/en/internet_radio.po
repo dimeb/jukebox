@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Station search"
+msgstr "Station search"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Country"
+msgstr "Country"
+
+msgid "Genre"
+msgstr "Genre"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Selected station"
+msgstr "Selected station"
+
+msgid "Delete selected station"
+msgstr "Delete selected station"
+
+msgid "Cannot delete selected station"
+msgstr "Cannot delete selected station, change background music source first."
+
+msgid "Internet radio database inaccessible"
+msgstr "Internet radio database inaccessible, please try again later."
+
+msgid "Internet radio download URL"
+msgstr "Internet radio download URL"
+
+msgid "Internet radio database update"
+msgstr "Download database and update local database"
+
+msgid "Last download"
+msgstr "Last download: %s"
+
+msgid "Invalid download URL"
+msgstr "Invalid download URL \"%s\"."
+

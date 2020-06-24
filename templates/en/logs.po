@@ -1,0 +1,41 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Log file name"
+msgstr "Log file name"
+
+msgid "Log file if empty"
+msgstr "If empty logs to stderr"
+
+msgid "Invalid log file name"
+msgstr "Invalid log file name \"%s\"."
+
+msgid "Rotate log file"
+msgstr "Rotate log file"
+
+msgid "Log file size"
+msgstr "When file size exceeds"
+
+msgid "Rotate log file now"
+msgstr "Rotate log file now"
+
+msgid "Debug"
+msgstr "Debug"
+
+msgid "Most ordered songs"
+msgstr "Most ordered songs"
+
+msgid "Chip money inserted"
+msgstr "Chip/money inserted"
+
+msgid "Period from-to"
+msgstr "Period from - to"
+
+msgid "Period from-to help"
+msgstr "Left empty for all-time results.<br>Choose two dates to choose period."
+
+msgid "Log file content"
+msgstr "Log file content"

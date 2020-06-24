@@ -1,0 +1,143 @@
+{{define "logs"}}
+<script src="/js/lightpicker.js"></script>
+<script>
+    var pageTitle = "{{.T.GetD `index` `Logs`}}";
+    var logRotateConfirm = "{{.T.GetD `index` `Are you sure`}}";
+    var logRotateRequestSent = "{{.T.GetD `index` `Request queued`}}";
+    var logRotateRequestError = "{{.T.GetD `index` `Request error`}}";
+    var lang = {{.Data.Cfg.WebAdminLanguage}}
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="logs-form" method="post" action="/logs">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `index` `Setup`}}</span></legend>
+    <div class="row">
+        <div class="col c2">
+            <label for="logs-debug">{{.T.GetD `logs` `Debug`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="checkbox" id="logs-debug" name="debug" {{if eq .Data.Cfg.Debug 1}}checked{{end}} />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="logs-logfile">{{.T.GetD `logs` `Log file name`}}</label>
+        </div>
+        <div class="col c10">
+            <input type="text" id="logs-logfile" name="logfile" value="{{.Data.Cfg.LogFile}}" />
+            <div class="input-help">{{.T.GetD `index` `Allowed characters filename`}}</div>
+            <div class="input-help">{{.T.GetD `logs` `Log file if empty`}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2 label-container">
+            <label for="logs-logfile-rotate">{{.T.GetD `logs` `Rotate log file`}}</label>
+        </div>
+        <div class="col c10">
+            <select id="logs-logfile-rotate" name="logfile_rotate_size">
+            <option value="500000" {{if eq 500000 $.Data.Cfg.LogFileRotateSize}}selected{{end}}>500 KB</option>
+            <option value="1000000" {{if eq 1000000 $.Data.Cfg.LogFileRotateSize}}selected{{end}}>1 MB</option>
+            <option value="2000000" {{if eq 2000000 $.Data.Cfg.LogFileRotateSize}}selected{{end}}>2 MB</option>
+            </select>
+            <div id="logs-logfile-rotate-button" class="btn btn-sm input-type-file-button">{{.T.GetD `logs` `Rotate log file now`}}</div>
+            <div class="input-help">{{.T.GetD `logs` `Log file size`}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c2">&nbsp;</div>
+        <div class="col c10">
+            <input type="submit" class="btn btn-sm" id="logs-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+        </div>
+    </div>
+</fieldset>
+</form>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="most-ordered-songs-form" method="post" action="/most_ordered_songs">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `logs` `Most ordered songs`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <label for="most-ordered-songs">{{.T.GetD `logs` `Period from-to`}}</label>
+            <input type="text" id="most-ordered-songs" name="most_ordered_songs" value="" readonly />
+            <div class="input-help">{{HTMLString (.T.GetD `logs` `Period from-to help`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div id="most-ordered-songs-list"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="btn btn-sm" onclick="mostOrderedSongsClear();">{{.T.GetD `index` `Clear`}}</div>
+            <input type="submit" class="btn btn-sm" id="most-ordered-songs-submit" name="submit" value="{{.T.GetD `index` `Search`}}" />
+        </div>
+    </div>
+</fieldset>
+</form>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="chip-money-inserted-form" method="post" action="/chip_money_inserted">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `logs` `Chip money inserted`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <label for="chip-money-inserted">{{.T.GetD `logs` `Period from-to`}}</label>
+            <input type="text" id="chip-money-inserted" name="chip_money_inserted" value="" readonly />
+            <div class="input-help">{{HTMLString (.T.GetD `logs` `Period from-to help`)}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div id="chip-money-inserted-list"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="btn btn-sm" onclick="chipMoneyInsertedClear();">{{.T.GetD `index` `Clear`}}</div>
+            <input type="submit" class="btn btn-sm" id="chip-money-inserted-submit" name="submit" value="{{.T.GetD `index` `Search`}}" />
+        </div>
+    </div>
+</fieldset>
+</form>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="log-file-content-form" method="get" action="/log_file_content">
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{.T.GetD `logs` `Log file content`}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <textarea id="log-file-content-content" rows="50" cols="136" style="width:80%;" disabled></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <input type="submit" class="btn btn-sm" id="log-file-content-submit" name="submit" value="{{.T.GetD `index` `Refresh`}}" />
+        </div>
+    </div>
+</fieldset>
+</form>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+</div>
+<br>
+<script src="/js/logs.js?v={{.JSV}}"></script>
+{{end}}

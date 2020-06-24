@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Random list"
+msgstr "Листа на папки/песни за позадинската музика"
+
+msgid "Random help"
+msgstr "Ако е празно позадинската музика ќе се избира од сите папки"
+
+msgid "Add folder song"
+msgstr "Додади папка/песна"
+
+msgid "Delete folder song"
+msgstr "Избриши ги вклучените папки/песни"
+
+msgid "Play list"
+msgstr "Листа на песни за избор"
+
+msgid "Slot"
+msgstr "Листа"
+
+msgid "Show"
+msgstr "Прикажи ја на екранот"
+
+msgid "Label"
+msgstr "Етикета"
+
+msgid "Label name"
+msgstr "Име на песната"
+
+msgid "Label author"
+msgstr "Автор на песната"
+
+msgid "Set song"
+msgstr "Постави песна"
+
+msgid "Delete song"
+msgstr "Избриши ја песната"
+
+msgid "Label format"
+msgstr "Формат на етикетата"
+
+msgid "Name author"
+msgstr "<span>Име на песната</span><br><span>Автор на песната</span>"
+
+msgid "Author name"
+msgstr "<span>Автор на песната</span><br><span>Име на песната</span>"
+
+msgid "Search song"
+msgstr "Пребарај песна"
+
+msgid "Browse list"
+msgstr "Папки за изборот со листање"
+
+msgid "Add folder"
+msgstr "Додади папка"
+
+msgid "Delete folder"
+msgstr "Избриши ги вклучените папки"
+
+msgid "Only folder selected"
+msgstr "Може да се изберат само папки"
+
+msgid "Browse help"
+msgstr "Ако е празно сите папки ќе можат да се листаат"

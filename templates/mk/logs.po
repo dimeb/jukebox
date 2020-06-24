@@ -1,0 +1,41 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Log file name"
+msgstr "Име на лог фајлот"
+
+msgid "Log file if empty"
+msgstr "Ако е празно логира на stderr"
+
+msgid "Invalid log file name"
+msgstr "Неисправно име на лог фајлот \"%s\"."
+
+msgid "Rotate log file"
+msgstr "Ротација на лог фајлот"
+
+msgid "Log file size"
+msgstr "Кога големината на фајлот ќе надмине"
+
+msgid "Rotate log file now"
+msgstr "Ротирај го лог фајлот сега"
+
+msgid "Debug"
+msgstr "Debug"
+
+msgid "Most ordered songs"
+msgstr "Најмногу нарачувани песни"
+
+msgid "Chip money inserted"
+msgstr "Внесено жетони/пари"
+
+msgid "Period from-to"
+msgstr "Период од - до"
+
+msgid "Period from-to help"
+msgstr "Остави го полето празно за сите резултати.<br>Избери два датуми за да го избереш периодот."
+
+msgid "Log file content"
+msgstr "Содржина на лог фајлот"

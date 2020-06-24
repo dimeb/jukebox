@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>{{.T.GetD `index` `Jukebox`}}</title>
+
+        <link href="data:," rel="icon">
+        <link href="/css/min.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/jukebox.css?v={{.JSV}}" rel="stylesheet" type="text/css" />
+        {{range .Stylesheets}}
+        <link href="/css/{{.}}" rel="stylesheet" type="text/css" />
+        {{end}}
+
+        <script>
+            var fileIsGreater = "{{.T.GetD `index` `File is greater`}}";
+        </script>
+    </head>
+    <body>
+        <nav class="nav" tabindex="-1" onclick="this.focus()">
+            <div class="container">
+                <a class="pagename current" href="/">{{.T.GetD `index` `Jukebox`}}</a>
+                <a href="/audio">{{.T.GetD `index` `Audio`}}</a>
+                <a href="/lists">{{.T.GetD `index` `Lists`}}</a>
+                <a href="/internet_radio">{{.T.GetD `index` `Internet radio`}}</a>
+                <a href="/config">{{.T.GetD `index` `Setup`}}</a>
+                <a href="/skin">{{.T.GetD `index` `Skin`}}</a>
+                <a href="/logs">{{.T.GetD `index` `Logs`}}</a>
+            </div>
+        </nav>
+        <button class="btn-close btn btn-sm">×</button>
+        <div class="container">
+            <div class="pagetitle">
+                <h2></h2>
+            </div>
+            <div id="message-error">{{if .MessageError}}{{HTMLString (StringsJoin .MessageError `<br>`)}}{{end}}</div>
+            <div id="message-ok">{{if .MessageOK}}{{HTMLString (StringsJoin .MessageOK `<br>`)}}{{end}}</div>
+        </div>
+{{$templateData := .}}{{range $i, $templateName := .Templates}}{{RenderTemplate $templateName $templateData}}{{end}}
+        <script src="/js/jukebox.js?v={{.JSV}}"></script>
+    </body>
+</html>

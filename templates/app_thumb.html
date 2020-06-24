@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>APP</title>
+
+        <link href="/css/app.css" rel="stylesheet" type="text/css" />
+
+        <style>
+/*
+ * Modal window.
+ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: none;
+  overflow: auto;
+  z-index: 999;
+}
+.modal-open {
+  display: block;
+}
+        </style>
+        <script>
+var skin = 'skin_thumb';
+
+function skinUsageText() {
+  return screenData.UsageSongText;
+}
+
+function skinSetUsage() {
+    document.getElementById('label-usage-text').innerHTML += '<span style="display:block;position:relative;top:5px;">' + screenData.UsageIconText + '</span>';
+    return;
+}
+
+function skinBodyInit() {
+    if (screenData.PlayLists.length > 0) {
+        for (var i = 0; i < buttonCodes.length; i++) {
+            const chr = buttonCodes.substring(i, i + 1);
+            const elem = document.getElementById('button-' + chr)
+            if (!elem) {
+                continue;
+            }
+            elem.removeAttribute('modal-image');
+            if (chr in screenData.Songs[playListNumber]) {
+                const name = screenData.Songs[playListNumber][chr].Name.trim();
+                const author = screenData.Songs[playListNumber][chr].Author.trim();
+                const icon = screenData.Songs[playListNumber][chr].Icon.trim();
+                if (name.length > 0 || author.length > 0) {
+                    if (icon.length > 0) {
+                        elem.src = 'data:image/' + icon;
+                        elem.setAttribute('modal-image', '');
+                    } else {
+                        elem.src = '/img/music_white.svg';
+                    }
+                } else {
+                    elem.src = '/img/music_blank.svg';
+                }
+            }
+        }
+    }
+}
+
+function skinInit() {
+    for (var i = 0; i < buttonCodes.length; i++) {
+        const chr = buttonCodes.substring(i, i + 1);
+        document.getElementById('label-top-'+chr).addEventListener('click', function(event) {
+            songSelection(chr);
+        });
+        document.getElementById('label-bottom-'+chr).addEventListener('click', function(event) {
+            songSelection(chr);
+        });
+        const belem = document.getElementById('button-'+chr);
+        if (!belem) {
+            continue;
+        }
+        belem.addEventListener('click', function(event) {
+            if (!belem.hasAttribute('modal-image')) {
+                return;
+            }
+            webSocket.send({
+                messageType: 'modalImage',
+                messageData: 'modal-container-image#'+playListNumber+'_'+chr
+            });
+            const elem = document.getElementById('modal-container');
+            if (elem && !elem.classList.contains('modal-open')) {
+                elem.classList.add('modal-open');
+            }
+        });
+    }
+    document.body.addEventListener('mousedown', function (event) {
+        const elem = document.getElementById('modal-container');
+        if (elem && elem.classList.contains('modal-open')) {
+            elem.classList.remove('modal-open');
+        }
+        document.getElementById('modal-container-image').src = '/img/music_white.svg';
+    });
+}
+        </script>
+    </head>
+    <body>
+        <div id="modal-container" class="modal"><img id="modal-container-image" src="/img/music_white.svg"></div>
+        <div class="table header">
+            <div class="button-usage"><img id="icon-usage" src="/img/icon_usage_blank.svg"></div><div class="label-usage"><div><div id="label-usage-text"></div></div></div>
+            <div class="label-selected"><div><div id="label-selected-text"></div><div id="label-selected-selection"></div></div></div>
+            <div class="label-actions"><div><div id="button-cancel-text"></div><div id="button-play-text"></div></div></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-a" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-a"></div></div><div><div id="label-bottom-a"></div></div></div>
+            <div class="button"><img id="button-g" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-g"></div></div><div><div id="label-bottom-g"></div></div></div>
+            <div class="label"><div><div id="label-top-m"></div></div><div><div id="label-bottom-m"></div></div></div><div class="button"><img id="button-m" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-s"></div></div><div><div id="label-bottom-s"></div></div></div><div class="button"><img id="button-s" src="/img/music_white.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-b" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-b"></div></div><div><div id="label-bottom-b"></div></div></div>
+            <div class="button"><img id="button-h" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-h"></div></div><div><div id="label-bottom-h"></div></div></div>
+            <div class="label"><div><div id="label-top-n"></div></div><div><div id="label-bottom-n"></div></div></div><div class="button"><img id="button-n" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-t"></div></div><div><div id="label-bottom-t"></div></div></div><div class="button"><img id="button-t" src="/img/music_white.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-c" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-c"></div></div><div><div id="label-bottom-c"></div></div></div>
+            <div class="button"><img id="button-i" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-i"></div></div><div><div id="label-bottom-i"></div></div></div>
+            <div class="label"><div><div id="label-top-o"></div></div><div><div id="label-bottom-o"></div></div></div><div class="button"><img id="button-o" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-u"></div></div><div><div id="label-bottom-u"></div></div></div><div class="button"><img id="button-u" src="/img/music_white.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-d" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-d"></div></div><div><div id="label-bottom-d"></div></div></div>
+            <div class="button"><img id="button-j" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-j"></div></div><div><div id="label-bottom-j"></div></div></div>
+            <div class="label"><div><div id="label-top-p"></div></div><div><div id="label-bottom-p"></div></div></div><div class="button"><img id="button-p" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-v"></div></div><div><div id="label-bottom-v"></div></div></div><div class="button"><img id="button-v" src="/img/music_white.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-e" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-e"></div></div><div><div id="label-bottom-e"></div></div></div>
+            <div class="button"><img id="button-k" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-k"></div></div><div><div id="label-bottom-k"></div></div></div>
+            <div class="label"><div><div id="label-top-q"></div></div><div><div id="label-bottom-q"></div></div></div><div class="button"><img id="button-q" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-w"></div></div><div><div id="label-bottom-w"></div></div></div><div class="button"><img id="button-w" src="/img/music_white.svg"></div>
+        </div>
+        <div class="table body">
+            <div class="button"><img id="button-f" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-f"></div></div><div><div id="label-bottom-f"></div></div></div>
+            <div class="button"><img id="button-l" src="/img/music_white.svg"></div><div class="label"><div><div id="label-top-l"></div></div><div><div id="label-bottom-l"></div></div></div>
+            <div class="label"><div><div id="label-top-r"></div></div><div><div id="label-bottom-r"></div></div></div><div class="button"><img id="button-r" src="/img/music_white.svg"></div>
+            <div class="label"><div><div id="label-top-x"></div></div><div><div id="label-bottom-x"></div></div></div><div class="button"><img id="button-x" src="/img/music_white.svg"></div>
+        </div>
+        <div id="play-list-selector" class="table footer"></div>
+        <script src="/js/app.js"></script>
+    </body>
+</html>
