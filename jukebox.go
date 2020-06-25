@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,10 @@ import (
 
 // Jukebox the jukebox structure.
 type Jukebox struct {
+	randomListPlayer           *exec.Cmd
+	randomListPlayerCmdBuffer  []byte
+	playListPlayer             *exec.Cmd
+	playListPlayerCmdBuffer    []byte
 	player                     *vlc.Player
 	randomListVolume           int
 	randomListVolumeChannel    chan int
