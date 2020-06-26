@@ -1,9 +1,8 @@
 module dimeb/jukebox
 
-go 1.13
+go 1.14
 
 require (
-	github.com/adrg/libvlc-go/v3 v3.0.2
 	github.com/bvinc/go-sqlite-lite v0.6.1
 	github.com/dhowden/tag v0.0.0-20191122115059-7e5c04feccd8
 	github.com/disintegration/imaging v1.6.2

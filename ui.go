@@ -168,7 +168,6 @@ func (ui *UserInterface) keyboard() {
 						logger.orderedSongsQueue <- s
 					}
 					jukebox.playListChannel <- s
-					jukebox.choiceMade <- true
 				}
 			} else {
 				logger.queue <- fmt.Sprint(err)
@@ -308,7 +307,6 @@ func (ui *UserInterface) screen(w http.ResponseWriter, r *http.Request) {
 						logger.orderedSongsQueue <- s
 					}
 					jukebox.playListChannel <- s
-					jukebox.choiceMade <- true
 				} else {
 					logger.queue <- fmt.Sprintf("jukebox screen selected song error %v", err)
 				}
@@ -325,7 +323,6 @@ func (ui *UserInterface) screen(w http.ResponseWriter, r *http.Request) {
 						logger.orderedSongsQueue <- fileName
 					}
 					jukebox.playListChannel <- fileName
-					jukebox.choiceMade <- true
 				} else {
 					logger.queue <- fmt.Sprintf("jukebox screen browser invalid song '%s'", song)
 				}

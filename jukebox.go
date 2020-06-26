@@ -8,22 +8,15 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
-
-	vlc "github.com/adrg/libvlc-go/v3"
 )
 
 // Jukebox the jukebox structure.
 type Jukebox struct {
-	player                     *exec.Cmd
-	playerStdin                io.WriteCloser
-	playerResponse             chan string
-	vlcPlayer                  *vlc.Player
+	singleSongToPlay           chan string
 	randomListVolume           int
 	randomListVolumeChannel    chan int
-	randomListChannel          chan string
 	playListVolume             int
 	playListVolumeChannel      chan int
 	playListChannel            chan string
@@ -31,151 +24,46 @@ type Jukebox struct {
 	internetRadioVolumeChannel chan int
 	internetRadioChanged       chan bool
 	backgroundMusicChanged     chan bool
-	songToPlay                 chan string
-	songFinished               chan bool
-	choiceMade                 chan bool
 	randomListChanged          chan bool
 	currentAudioVolumeChannel  chan int
 }
 
-var jukebox *Jukebox
-
-// NewJukebox creates new jukebox.
-func NewJukebox() (*Jukebox, error) {
-	var (
-		err error
-		j   *Jukebox
-	)
-
-	j = &Jukebox{
-		playerResponse: make(chan string),
+var (
+	jukebox = Jukebox{
+		singleSongToPlay:           make(chan string, 1),
+		randomListVolume:           cfg.RandomListVolume,
+		randomListVolumeChannel:    make(chan int, 1),
+		playListVolume:             cfg.PlayListVolume,
+		playListVolumeChannel:      make(chan int, 1),
+		playListChannel:            make(chan string, 2048),
+		internetRadioVolume:        cfg.InternetRadioVolume,
+		internetRadioVolumeChannel: make(chan int, 1),
+		internetRadioChanged:       make(chan bool, 1),
+		backgroundMusicChanged:     make(chan bool, 1),
+		randomListChanged:          make(chan bool),
+		currentAudioVolumeChannel:  make(chan int),
 	}
-	j.vlcPlayer, err = vlc.NewPlayer()
-	if err != nil {
-		return nil, err
-	}
-	err = j.createPlayer()
-	if err != nil {
-		return nil, err
-	}
-	j.randomListVolume = cfg.RandomListVolume
-	j.randomListVolumeChannel = make(chan int, 1)
-	j.randomListChannel = make(chan string, 1)
-	j.playListVolume = cfg.PlayListVolume
-	j.playListVolumeChannel = make(chan int, 1)
-	j.playListChannel = make(chan string, 2048)
-	j.internetRadioVolume = cfg.InternetRadioVolume
-	j.internetRadioVolumeChannel = make(chan int, 1)
-	j.internetRadioChanged = make(chan bool, 1)
-	j.backgroundMusicChanged = make(chan bool, 1)
-	j.songToPlay = make(chan string, 1)
-	j.songFinished = make(chan bool)
-	j.choiceMade = make(chan bool)
-	j.randomListChanged = make(chan bool)
-	j.currentAudioVolumeChannel = make(chan int)
-
-	return j, nil
-}
-
-// Create the player
-func (j *Jukebox) createPlayer() (err error) {
-	if j.player != nil {
-		return
-	}
-
-	defer func() {
-		if err == nil {
-			return
-		}
-		if j.player != nil {
-			j.player.Process.Kill()
-		}
-	}()
-
-	j.player = exec.Command(`rvlc`, cfg.VLCOptions...)
-	j.player.Env = os.Environ()
-	j.player.SysProcAttr = &syscall.SysProcAttr{
-		// Pdeathsig: syscall.SIGKILL,
-		Pdeathsig: syscall.SIGTERM,
-	}
-
-	if j.playerStdin, err = j.player.StdinPipe(); err != nil {
-		return
-	}
-	defer func() {
-		if e := j.playerStdin.Close(); e != nil {
-			logger.queue <- fmt.Sprint(e)
-		}
-	}()
-
-	stdout, err := j.player.StdoutPipe()
-	if err != nil {
-		return
-	}
-	defer func() {
-		if e := stdout.Close(); e != nil {
-			logger.queue <- fmt.Sprint(e)
-		}
-	}()
-
-	if err = j.player.Start(); err != nil {
-		return
-	}
-
-	go func() {
-		r := bufio.NewReader(stdout)
-		for {
-			s, _ := r.ReadString('\n')
-			j.playerResponse <- s[:len(s)-1]
-		}
-	}()
-
-	go func() {
-		if e := j.player.Wait(); e != nil {
-			logger.queue <- fmt.Sprint(e)
-		}
-		j.player = nil
-	}()
-
-	return
-}
+)
 
 // Sets the volume of the player.
-func (j *Jukebox) setVolume(volume int) {
+func (j *Jukebox) setVolume(volume int, gain int) string {
 	if volume < 0 {
 		volume = 0
 	}
-	if err := j.vlcPlayer.SetVolume(volume); err != nil {
-		logger.queue <- fmt.Sprint(err)
-		if err := j.vlcPlayer.SetVolume(100); err != nil {
-			logger.queue <- fmt.Sprint(err)
-		}
-	}
-}
-
-// Returns true if internet radio is selected for background music.
-func (j *Jukebox) internetRadioSelected() bool {
-	return cfg.BackgroundMusic == `internet radio` && cfg.InternetRadioSelectedURL != ``
-}
-
-// Release media player, stop playing.
-func (j *Jukebox) releaseMedia() {
-	m, err := j.vlcPlayer.Media()
-	if err != nil {
-		logger.queue <- fmt.Sprint(err)
-	} else {
-		m.Release()
-	}
+	return string(int((float64(volume+gain) / 100.0) * 256.0))
 }
 
 // The player.
 func (j *Jukebox) play() {
 	var (
-		err     error
-		media   *vlc.Media
-		manager *vlc.EventManager
-		eventID vlc.EventID
+		err error
 	)
+
+	defer func() {
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+	}()
 
 	// Create player.
 	cmd := exec.Command(`rvlc`, cfg.VLCOptions...)
@@ -209,74 +97,118 @@ func (j *Jukebox) play() {
 		}
 	}()
 
-	go func() {
+	go func(err error) {
 		if err = cmd.Wait(); err != nil {
 			logger.queue <- fmt.Sprint(err)
 		}
-	}()
+	}(err)
 
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 
+	ctrl := ``
+	singleSong := ``
+	isPlaying := `0`
+	backgroundPlaying := false
+	internetRadioPlaying := false
 	for {
 		select {
-		case <-ticker.C:
-			io.WriteString(stdin, "is_playing\n")
-		case o := <-output:
-			if o == `0` {
-				s := "clear\nloop off\n"
-				if cfg.BackgroundMusic == `list` {
-					s += "repeat on\nrandom on\nadd "
-					s += lists.randomPlayListFile
-				} else if cfg.BackgroundMusic == `internet radio` {
-					if jukebox.internetRadioSelected() {
-						s += "repeat off\nrandom off\nadd "
-						s += cfg.InternetRadioSelectedURL
-					} else {
-						logger.queue <- `no station selected for playing internet radio`
-						s += "repeat on\nrandom on\nadd "
-						s += lists.randomPlayListFile
+		case singleSong = <-j.singleSongToPlay:
+			ctrl = "clear\nloop off\nrepeat off\nrandom off\nvolume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + singleSong
+		case song := <-j.playListChannel:
+			ctrl = ``
+			if backgroundPlaying {
+				backgroundPlaying = false
+				ctrl = "clear\nloop off\nrepeat off\nrandom off\n"
+			}
+			ctrl += "volume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + song
+		case <-j.randomListChanged:
+			lists.randomList()
+			if backgroundPlaying && !internetRadioPlaying {
+				ctrl = "clear\n"
+			}
+		case <-j.internetRadioChanged:
+			if backgroundPlaying && internetRadioPlaying {
+				ctrl = "clear\n"
+			}
+		case <-j.backgroundMusicChanged:
+			if backgroundPlaying {
+				ctrl = "clear\n"
+			}
+		case gain := <-j.playListVolumeChannel:
+			j.playListVolume += gain
+			if isPlaying == `1` && !backgroundPlaying {
+				ctrl = `volume ` + j.setVolume(j.playListVolume, gain) + "\n"
+			}
+			if cfg.Debug != 0 {
+				logger.queue <- fmt.Sprintf("playListVolume changed by %d, current value %d", gain, j.playListVolume)
+			}
+		case gain := <-j.randomListVolumeChannel:
+			j.randomListVolume += gain
+			if isPlaying == `1` && backgroundPlaying && !internetRadioPlaying {
+				ctrl = `volume ` + j.setVolume(j.randomListVolume, gain) + "\n"
+			}
+			if cfg.Debug != 0 {
+				logger.queue <- fmt.Sprintf("randomListVolume changed by %d, current value %d", gain, j.randomListVolume)
+			}
+		case gain := <-j.internetRadioVolumeChannel:
+			j.internetRadioVolume += gain
+			if isPlaying == `1` && backgroundPlaying && internetRadioPlaying {
+				ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain) + "\n"
+			}
+			if cfg.Debug != 0 {
+				logger.queue <- fmt.Sprintf("internetRadioVolume changed by %d, current value %d", gain, j.internetRadioVolume)
+			}
+		case gain := <-jukebox.currentAudioVolumeChannel:
+			if backgroundPlaying {
+				j.playListVolume += gain
+				if isPlaying == `1` {
+					ctrl = `volume ` + j.setVolume(j.playListVolume, gain) + "\n"
+				}
+			} else {
+				if internetRadioPlaying {
+					j.internetRadioVolume += gain
+					if isPlaying == `1` {
+						ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain) + "\n"
+					}
+				} else {
+					j.randomListVolume += gain
+					if isPlaying == `1` {
+						ctrl = `volume ` + j.setVolume(j.randomListVolume, gain) + "\n"
 					}
 				}
-				io.WriteString(stdin, fmt.Sprintf("%s\n", s))
+			}
+		case <-ticker.C:
+			ctrl = "is_playing\n"
+		case isPlaying = <-output:
+			if isPlaying == `0` {
+				if singleSong != `` {
+					cmd.Process.Kill()
+					return
+				}
+				backgroundPlaying = true
+				s := ``
+				if cfg.BackgroundMusic == `internet radio` {
+					if cfg.InternetRadioSelectedURL != `` {
+						internetRadioPlaying = true
+						s = "repeat off\nrandom off\nadd " + cfg.InternetRadioSelectedURL
+						logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
+					} else {
+						logger.queue <- `no station selected for playing internet radio`
+					}
+				}
+				if s == `` {
+					internetRadioPlaying = false
+					s = "repeat on\nrandom on\nadd " + lists.randomPlayListFile
+					logger.queue <- `playing from random list`
+				}
+				ctrl = "clear\nloop off\n" + s
 			}
 		}
-	}
 
-	/*
-	*
-	* OLD !!!
-	 */
-
-	if manager, err = j.vlcPlayer.EventManager(); err != nil {
-		logger.queue <- fmt.Sprint(err)
-		return
-	}
-	callback := func(event vlc.Event, userData interface{}) {
-		j.songFinished <- true
-	}
-	eventID, err = manager.Attach(vlc.MediaPlayerEndReached, callback, nil)
-	if err != nil {
-		return
-	}
-	defer manager.Detach(eventID)
-	for {
-		select {
-		case s := <-j.songToPlay:
-			if strings.HasPrefix(s, `http://`) || strings.HasPrefix(s, `https://`) {
-				media, err = j.vlcPlayer.LoadMediaFromURL(s)
-			} else {
-				media, err = j.vlcPlayer.LoadMediaFromPath(s)
-			}
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				continue
-			}
-			defer media.Release()
-			if err = j.vlcPlayer.Play(); err != nil {
-				logger.queue <- fmt.Sprint(err)
-				continue
-			}
+		if ctrl != `` {
+			io.WriteString(stdin, ctrl+"\n")
+			ctrl = ``
 		}
 	}
 }

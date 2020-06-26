@@ -75,22 +75,11 @@ func main() {
 		logger.fatalQueue <- fmt.Sprint(err)
 	}
 
-	// Create a new jukebox.
-	jukebox, err = NewJukebox()
-	if err != nil {
-		logger.fatalQueue <- fmt.Sprint(err)
-	}
-	defer func() {
-		jukebox.vlcPlayer.Stop()
-		jukebox.vlcPlayer.Release()
-	}()
-	go jukebox.play()
-
 	// If there is a flagFile, play it and exit.
 	// Else start the jukebox.
 	if flagFile != `` {
-		jukebox.setVolume(jukebox.playListVolume)
-		jukebox.songToPlay <- flagFile
+		// jukebox.setVolume(jukebox.playListVolume)
+		// jukebox.songToPlay <- flagFile
 	} else {
 		// Open internet radio database.
 		internetRadio = NewInternetRadio()
@@ -121,114 +110,17 @@ func main() {
 
 		// If there is internet radio configured, play it.
 		// Else begin with a random song.
-		if jukebox.internetRadioSelected() {
-			jukebox.setVolume(jukebox.internetRadioVolume)
-			jukebox.songToPlay <- cfg.InternetRadioSelectedURL
-			logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
-		} else {
-			jukebox.setVolume(jukebox.randomListVolume)
-			jukebox.songToPlay <- <-jukebox.randomListChannel
-		}
-	}
-
-	// Play.
-	chosenSong := ``
-	randomSong := ``
-	internetRadioFile := false
-	chosen := false
-	for {
-		select {
-		case <-jukebox.randomListChanged:
-			lists.randomList()
-		case <-jukebox.backgroundMusicChanged:
-			if !chosen {
-				jukebox.releaseMedia()
-				if cfg.BackgroundMusic == `list` {
-					randomSong = <-jukebox.randomListChannel
-				} else if cfg.BackgroundMusic == `internet radio` {
-					if jukebox.internetRadioSelected() {
-						internetRadioFile = true
-					} else {
-						logger.queue <- `no station selected for playing internet radio`
-						randomSong = <-jukebox.randomListChannel
-					}
-				}
-			}
-		case <-jukebox.internetRadioChanged:
-			if !chosen && jukebox.internetRadioSelected() {
-				jukebox.releaseMedia()
-				internetRadioFile = true
-			}
-		case <-jukebox.songFinished:
-			if flagFile != `` {
-				os.Exit(0)
-			}
-			select {
-			case chosenSong = <-jukebox.playListChannel:
-			default:
-				select {
-				case randomSong = <-jukebox.randomListChannel:
-				}
-			}
-		case <-jukebox.choiceMade:
-			if !chosen {
-				select {
-				case chosenSong = <-jukebox.playListChannel:
-					jukebox.releaseMedia()
-				}
-			}
-		case gain := <-jukebox.randomListVolumeChannel:
-			jukebox.randomListVolume += gain
-			if cfg.Debug != 0 {
-				logger.queue <- fmt.Sprintf("randomListVolume changed by %d, current value %d", gain, jukebox.randomListVolume)
-			}
-			if !chosen && !jukebox.internetRadioSelected() {
-				jukebox.setVolume(jukebox.randomListVolume)
-			}
-		case gain := <-jukebox.playListVolumeChannel:
-			jukebox.playListVolume += gain
-			if cfg.Debug != 0 {
-				logger.queue <- fmt.Sprintf("playListVolume changed by %d, current value %d", gain, jukebox.playListVolume)
-			}
-			if chosen {
-				jukebox.setVolume(jukebox.playListVolume)
-			}
-		case gain := <-jukebox.internetRadioVolumeChannel:
-			jukebox.internetRadioVolume += gain
-			if cfg.Debug != 0 {
-				logger.queue <- fmt.Sprintf("internetRadioVolume changed by %d, current value %d", gain, jukebox.internetRadioVolume)
-			}
-			if !chosen && jukebox.internetRadioSelected() {
+		/*
+			if jukebox.internetRadioSelected() {
 				jukebox.setVolume(jukebox.internetRadioVolume)
-			}
-		case gain := <-jukebox.currentAudioVolumeChannel:
-			if chosen {
-				jukebox.playListVolumeChannel <- gain
+				jukebox.songToPlay <- cfg.InternetRadioSelectedURL
+				logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
 			} else {
-				if jukebox.internetRadioSelected() {
-					jukebox.internetRadioVolumeChannel <- gain
-				} else {
-					jukebox.randomListVolumeChannel <- gain
-				}
+				jukebox.setVolume(jukebox.randomListVolume)
+				jukebox.songToPlay <- <-jukebox.randomListChannel
 			}
-		}
-
-		if chosenSong != `` {
-			jukebox.setVolume(jukebox.playListVolume)
-			jukebox.songToPlay <- chosenSong
-			chosenSong = ``
-			chosen = true
-		} else if randomSong != `` {
-			jukebox.setVolume(jukebox.randomListVolume)
-			jukebox.songToPlay <- randomSong
-			randomSong = ``
-			chosen = false
-		} else if internetRadioFile {
-			jukebox.setVolume(jukebox.internetRadioVolume)
-			jukebox.songToPlay <- cfg.InternetRadioSelectedURL
-			internetRadioFile = false
-			chosen = false
-			logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
-		}
+		*/
 	}
+
+	jukebox.play()
 }
