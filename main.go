@@ -1,14 +1,9 @@
 package main
 
 import (
-	crypto_rand "crypto/rand"
-	"encoding/binary"
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
-
-	vlc "github.com/adrg/libvlc-go/v3"
 )
 
 var (
@@ -19,13 +14,6 @@ var (
 )
 
 func init() {
-	// rand.Seed(time.Now().UnixNano())
-	var b [8]byte
-	_, err := crypto_rand.Read(b[:])
-	if err != nil {
-		panic(err)
-	}
-	rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
 	flag.Usage = func() {
 		fmt.Printf("Usage: %s [options]\n", os.Args[0])
 		fmt.Println(`If options are given, runs them and exit.`)
@@ -81,12 +69,6 @@ func main() {
 		logger.queue <- fmt.Sprint(err)
 	}
 
-	// Initialize vlc library.
-	if err = vlc.Init(cfg.VLCOptions...); err != nil {
-		logger.fatalQueue <- fmt.Sprint(err)
-	}
-	defer vlc.Release()
-
 	// Create GPIO.
 	gpio, err = NewGPIO()
 	if err != nil {
@@ -99,8 +81,8 @@ func main() {
 		logger.fatalQueue <- fmt.Sprint(err)
 	}
 	defer func() {
-		jukebox.player.Stop()
-		jukebox.player.Release()
+		jukebox.vlcPlayer.Stop()
+		jukebox.vlcPlayer.Release()
 	}()
 	go jukebox.play()
 
@@ -157,7 +139,7 @@ func main() {
 	for {
 		select {
 		case <-jukebox.randomListChanged:
-			lists.randomListFileCount()
+			lists.randomList()
 		case <-jukebox.backgroundMusicChanged:
 			if !chosen {
 				jukebox.releaseMedia()

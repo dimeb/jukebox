@@ -100,7 +100,7 @@ var (
 			`--ignore-config`,
 			`--no-video`,
 			`--quiet`,
-			`--play-and-exit`,
+			// `--play-and-exit`,
 			`--audio-filter`,
 			`normvol`,
 			`--norm-buff-size=10`,

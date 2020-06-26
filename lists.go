@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/dhowden/tag"
 	"github.com/disintegration/imaging"
@@ -52,12 +50,12 @@ type Lists struct {
 	playListNumber string
 	// Valid song codecs.
 	codecs []string
-	// Number of files in random list.
-	randomListCount int
 	// Options for label content.
 	labelContentOptions [18]string
 	// Artwork directory
 	artworkDir string
+	// random play list file
+	randomPlayListFile string
 }
 
 var (
@@ -110,7 +108,8 @@ var (
 			`author-right-name-center`,
 			`author-right-name-right`,
 		},
-		artworkDir: `art/`,
+		artworkDir:         `art/`,
+		randomPlayListFile: `random_list.m3u8`,
 	}
 )
 
@@ -152,7 +151,12 @@ func (l *Lists) load() error {
 	if toSave {
 		err = l.save()
 	}
-	l.randomListFileCount()
+
+	_, e := os.Stat(l.randomPlayListFile)
+	if os.IsNotExist(e) {
+		l.randomList()
+	}
+
 	return err
 }
 
@@ -168,11 +172,10 @@ func (l Lists) save() error {
 // Returns a new Lists object, copy of the current Lists object.
 func (l Lists) copy() Lists {
 	var newL = Lists{
-		LabelContent:    l.LabelContent,
-		rootDir:         l.rootDir,
-		listsFile:       l.listsFile,
-		playListNumber:  l.playListNumber,
-		randomListCount: l.randomListCount,
+		LabelContent:   l.LabelContent,
+		rootDir:        l.rootDir,
+		listsFile:      l.listsFile,
+		playListNumber: l.playListNumber,
 	}
 
 	newL.RandomList = append(newL.RandomList, l.RandomList...)
@@ -216,23 +219,27 @@ func (l Lists) checkSong(name string) bool {
 	return false
 }
 
-// Check random list.
-func (l *Lists) checkRandomList() []string {
+// Generate random song list.
+func (l Lists) randomList() {
+	var lst []string
 	if len(l.RandomList) > 0 {
-		return l.RandomList
+		copy(lst, l.RandomList)
+	} else {
+		files, _ := ioutil.ReadDir(l.rootDir)
+		for _, file := range files {
+			lst = append(lst, file.Name())
+		}
 	}
-	rl := []string{}
-	files, _ := ioutil.ReadDir(l.rootDir)
-	for _, file := range files {
-		rl = append(rl, file.Name())
+	if len(lst) == 0 {
+		return
 	}
-	return rl
-}
-
-// Count files in random list.
-func (l *Lists) randomListFileCount() {
-	l.randomListCount = 0
-	for _, dir := range l.checkRandomList() {
+	f, err := os.Create(l.randomPlayListFile)
+	if err != nil {
+		logger.queue <- fmt.Sprint(err)
+		return
+	}
+	defer f.Close()
+	for _, dir := range lst {
 		dir = l.rootDir + dir
 		info, err := os.Stat(dir)
 		if err != nil {
@@ -241,7 +248,10 @@ func (l *Lists) randomListFileCount() {
 		}
 		if info.Mode().IsRegular() {
 			if l.checkSong(dir) {
-				l.randomListCount++
+				_, err = f.Write([]byte(dir + "\n"))
+				if err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
 			}
 			continue
 		}
@@ -251,86 +261,15 @@ func (l *Lists) randomListFileCount() {
 			}
 			if info.Mode().IsRegular() {
 				if l.checkSong(path) {
-					l.randomListCount++
+					if _, e := f.Write([]byte(path + "\n")); e != nil {
+						logger.queue <- fmt.Sprint(e)
+					}
 				}
 			}
 			return nil
 		})
-	}
-	if cfg.Debug != 0 {
-		logger.queue <- fmt.Sprintf("songs in random list: %d", l.randomListCount)
-	}
-}
-
-// Generate random song to play.
-func (l Lists) randomList() {
-	logged := false
-	rl := l.checkRandomList()
-	for {
-		if l.randomListCount == 0 {
-			if !logged {
-				logger.queue <- `random list is empty`
-			}
-			logged = true
-			time.Sleep(time.Second)
-			continue
-		}
-		logged = false
-		song := ``
-		n := rand.Intn(l.randomListCount)
-		if cfg.Debug != 0 {
-			logger.queue <- fmt.Sprintf("random number generated: %d", n)
-		}
-		if n == 0 {
-			n = 1
-		}
-		i := 1
-		for _, dir := range rl {
-			dir = l.rootDir + dir
-			info, err := os.Stat(dir)
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				continue
-			}
-			if info.Mode().IsRegular() {
-				if l.checkSong(dir) {
-					if i >= n {
-						song = dir
-						break
-					}
-					i++
-				}
-				continue
-			}
-			if song == `` {
-				filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-					if err != nil {
-						logger.queue <- fmt.Sprint(err)
-						return filepath.SkipDir
-					}
-					if info.Mode().IsRegular() {
-						if l.checkSong(path) {
-							if i >= n {
-								song = path
-								return fmt.Errorf(`Done`)
-							}
-							i++
-						}
-					}
-					return nil
-				})
-				if song != `` {
-					break
-				}
-			}
-		}
-		if song == `` {
-			logger.queue <- `random song not found`
-		} else {
-			if cfg.Debug != 0 {
-				logger.queue <- fmt.Sprintf("selected from random list \"%s\"", song)
-			}
-			jukebox.randomListChannel <- song
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
 		}
 	}
 }

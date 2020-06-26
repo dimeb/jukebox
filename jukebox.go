@@ -1,22 +1,26 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	vlc "github.com/adrg/libvlc-go/v3"
 )
 
 // Jukebox the jukebox structure.
 type Jukebox struct {
-	randomListPlayer           *exec.Cmd
-	randomListPlayerCmdBuffer  []byte
-	playListPlayer             *exec.Cmd
-	playListPlayerCmdBuffer    []byte
-	player                     *vlc.Player
+	player                     *exec.Cmd
+	playerStdin                io.WriteCloser
+	playerResponse             chan string
+	vlcPlayer                  *vlc.Player
 	randomListVolume           int
 	randomListVolumeChannel    chan int
 	randomListChannel          chan string
@@ -43,8 +47,14 @@ func NewJukebox() (*Jukebox, error) {
 		j   *Jukebox
 	)
 
-	j = &Jukebox{}
-	j.player, err = vlc.NewPlayer()
+	j = &Jukebox{
+		playerResponse: make(chan string),
+	}
+	j.vlcPlayer, err = vlc.NewPlayer()
+	if err != nil {
+		return nil, err
+	}
+	err = j.createPlayer()
 	if err != nil {
 		return nil, err
 	}
@@ -67,14 +77,77 @@ func NewJukebox() (*Jukebox, error) {
 	return j, nil
 }
 
+// Create the player
+func (j *Jukebox) createPlayer() (err error) {
+	if j.player != nil {
+		return
+	}
+
+	defer func() {
+		if err == nil {
+			return
+		}
+		if j.player != nil {
+			j.player.Process.Kill()
+		}
+	}()
+
+	j.player = exec.Command(`rvlc`, cfg.VLCOptions...)
+	j.player.Env = os.Environ()
+	j.player.SysProcAttr = &syscall.SysProcAttr{
+		// Pdeathsig: syscall.SIGKILL,
+		Pdeathsig: syscall.SIGTERM,
+	}
+
+	if j.playerStdin, err = j.player.StdinPipe(); err != nil {
+		return
+	}
+	defer func() {
+		if e := j.playerStdin.Close(); e != nil {
+			logger.queue <- fmt.Sprint(e)
+		}
+	}()
+
+	stdout, err := j.player.StdoutPipe()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if e := stdout.Close(); e != nil {
+			logger.queue <- fmt.Sprint(e)
+		}
+	}()
+
+	if err = j.player.Start(); err != nil {
+		return
+	}
+
+	go func() {
+		r := bufio.NewReader(stdout)
+		for {
+			s, _ := r.ReadString('\n')
+			j.playerResponse <- s[:len(s)-1]
+		}
+	}()
+
+	go func() {
+		if e := j.player.Wait(); e != nil {
+			logger.queue <- fmt.Sprint(e)
+		}
+		j.player = nil
+	}()
+
+	return
+}
+
 // Sets the volume of the player.
 func (j *Jukebox) setVolume(volume int) {
 	if volume < 0 {
 		volume = 0
 	}
-	if err := j.player.SetVolume(volume); err != nil {
+	if err := j.vlcPlayer.SetVolume(volume); err != nil {
 		logger.queue <- fmt.Sprint(err)
-		if err := j.player.SetVolume(100); err != nil {
+		if err := j.vlcPlayer.SetVolume(100); err != nil {
 			logger.queue <- fmt.Sprint(err)
 		}
 	}
@@ -87,7 +160,7 @@ func (j *Jukebox) internetRadioSelected() bool {
 
 // Release media player, stop playing.
 func (j *Jukebox) releaseMedia() {
-	m, err := j.player.Media()
+	m, err := j.vlcPlayer.Media()
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
 	} else {
@@ -104,7 +177,78 @@ func (j *Jukebox) play() {
 		eventID vlc.EventID
 	)
 
-	if manager, err = j.player.EventManager(); err != nil {
+	// Create player.
+	cmd := exec.Command(`rvlc`, cfg.VLCOptions...)
+	cmd.Env = os.Environ()
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		// Pdeathsig: syscall.SIGKILL,
+		Pdeathsig: syscall.SIGTERM,
+	}
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return
+	}
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	if err = cmd.Start(); err != nil {
+		return
+	}
+
+	output := make(chan string)
+	defer close(output)
+	go func() {
+		r := bufio.NewReader(stdout)
+		for {
+			s, _ := r.ReadString('\n')
+			output <- s[:len(s)-1]
+		}
+	}()
+
+	go func() {
+		if err = cmd.Wait(); err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+	}()
+
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			io.WriteString(stdin, "is_playing\n")
+		case o := <-output:
+			if o == `0` {
+				s := "clear\nloop off\n"
+				if cfg.BackgroundMusic == `list` {
+					s += "repeat on\nrandom on\nadd "
+					s += lists.randomPlayListFile
+				} else if cfg.BackgroundMusic == `internet radio` {
+					if jukebox.internetRadioSelected() {
+						s += "repeat off\nrandom off\nadd "
+						s += cfg.InternetRadioSelectedURL
+					} else {
+						logger.queue <- `no station selected for playing internet radio`
+						s += "repeat on\nrandom on\nadd "
+						s += lists.randomPlayListFile
+					}
+				}
+				io.WriteString(stdin, fmt.Sprintf("%s\n", s))
+			}
+		}
+	}
+
+	/*
+	*
+	* OLD !!!
+	 */
+
+	if manager, err = j.vlcPlayer.EventManager(); err != nil {
 		logger.queue <- fmt.Sprint(err)
 		return
 	}
@@ -120,16 +264,16 @@ func (j *Jukebox) play() {
 		select {
 		case s := <-j.songToPlay:
 			if strings.HasPrefix(s, `http://`) || strings.HasPrefix(s, `https://`) {
-				media, err = j.player.LoadMediaFromURL(s)
+				media, err = j.vlcPlayer.LoadMediaFromURL(s)
 			} else {
-				media, err = j.player.LoadMediaFromPath(s)
+				media, err = j.vlcPlayer.LoadMediaFromPath(s)
 			}
 			if err != nil {
 				logger.queue <- fmt.Sprint(err)
 				continue
 			}
 			defer media.Release()
-			if err = j.player.Play(); err != nil {
+			if err = j.vlcPlayer.Play(); err != nil {
 				logger.queue <- fmt.Sprint(err)
 				continue
 			}
