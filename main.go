@@ -10,7 +10,6 @@ var (
 	flagFile          string
 	flagHashString    string
 	flagDefaultConfig bool
-	flagUniOfficeTest bool
 )
 
 func init() {
@@ -24,7 +23,6 @@ func init() {
 	flag.StringVar(&flagFile, `file`, ``, `Specify single audio file to play.`)
 	flag.StringVar(&flagHashString, `hash`, ``, `Hash the given string.`)
 	flag.BoolVar(&flagDefaultConfig, `default_config`, false, `Create configuration file from built-in configuration.`)
-	flag.BoolVar(&flagUniOfficeTest, `test.v`, true, `Unioffice test.`)
 }
 
 func main() {
@@ -78,8 +76,7 @@ func main() {
 	// If there is a flagFile, play it and exit.
 	// Else start the jukebox.
 	if flagFile != `` {
-		// jukebox.setVolume(jukebox.playListVolume)
-		// jukebox.songToPlay <- flagFile
+		jukebox.singleSongToPlay <- flagFile
 	} else {
 		// Open internet radio database.
 		internetRadio = NewInternetRadio()
@@ -104,22 +101,6 @@ func main() {
 		userInterface = NewUserInterface()
 		// Keyboard input goroutine.
 		go userInterface.keyboard()
-
-		// Random list goroutine.
-		go lists.randomList()
-
-		// If there is internet radio configured, play it.
-		// Else begin with a random song.
-		/*
-			if jukebox.internetRadioSelected() {
-				jukebox.setVolume(jukebox.internetRadioVolume)
-				jukebox.songToPlay <- cfg.InternetRadioSelectedURL
-				logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
-			} else {
-				jukebox.setVolume(jukebox.randomListVolume)
-				jukebox.songToPlay <- <-jukebox.randomListChannel
-			}
-		*/
 	}
 
 	jukebox.play()

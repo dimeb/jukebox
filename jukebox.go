@@ -50,14 +50,13 @@ func (j *Jukebox) setVolume(volume int, gain int) string {
 	if volume < 0 {
 		volume = 0
 	}
-	return string(int((float64(volume+gain) / 100.0) * 256.0))
+	return fmt.Sprintf("%d", int((float64(volume+gain)/100.0)*256.0))
 }
 
 // The player.
 func (j *Jukebox) play() {
-	var (
-		err error
-	)
+	const vlcPrompt = `> `
+	var err error
 
 	defer func() {
 		if err != nil {
@@ -93,7 +92,8 @@ func (j *Jukebox) play() {
 		r := bufio.NewReader(stdout)
 		for {
 			s, _ := r.ReadString('\n')
-			output <- s[:len(s)-1]
+			// output <- s[:len(s)-1]
+			output <- string(s[2])
 		}
 	}()
 
@@ -125,20 +125,20 @@ func (j *Jukebox) play() {
 		case <-j.randomListChanged:
 			lists.randomList()
 			if backgroundPlaying && !internetRadioPlaying {
-				ctrl = "clear\n"
+				ctrl = "clear"
 			}
 		case <-j.internetRadioChanged:
 			if backgroundPlaying && internetRadioPlaying {
-				ctrl = "clear\n"
+				ctrl = "clear"
 			}
 		case <-j.backgroundMusicChanged:
 			if backgroundPlaying {
-				ctrl = "clear\n"
+				ctrl = "clear"
 			}
 		case gain := <-j.playListVolumeChannel:
 			j.playListVolume += gain
 			if isPlaying == `1` && !backgroundPlaying {
-				ctrl = `volume ` + j.setVolume(j.playListVolume, gain) + "\n"
+				ctrl = `volume ` + j.setVolume(j.playListVolume, gain)
 			}
 			if cfg.Debug != 0 {
 				logger.queue <- fmt.Sprintf("playListVolume changed by %d, current value %d", gain, j.playListVolume)
@@ -146,7 +146,7 @@ func (j *Jukebox) play() {
 		case gain := <-j.randomListVolumeChannel:
 			j.randomListVolume += gain
 			if isPlaying == `1` && backgroundPlaying && !internetRadioPlaying {
-				ctrl = `volume ` + j.setVolume(j.randomListVolume, gain) + "\n"
+				ctrl = `volume ` + j.setVolume(j.randomListVolume, gain)
 			}
 			if cfg.Debug != 0 {
 				logger.queue <- fmt.Sprintf("randomListVolume changed by %d, current value %d", gain, j.randomListVolume)
@@ -154,7 +154,7 @@ func (j *Jukebox) play() {
 		case gain := <-j.internetRadioVolumeChannel:
 			j.internetRadioVolume += gain
 			if isPlaying == `1` && backgroundPlaying && internetRadioPlaying {
-				ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain) + "\n"
+				ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain)
 			}
 			if cfg.Debug != 0 {
 				logger.queue <- fmt.Sprintf("internetRadioVolume changed by %d, current value %d", gain, j.internetRadioVolume)
@@ -163,24 +163,24 @@ func (j *Jukebox) play() {
 			if backgroundPlaying {
 				j.playListVolume += gain
 				if isPlaying == `1` {
-					ctrl = `volume ` + j.setVolume(j.playListVolume, gain) + "\n"
+					ctrl = `volume ` + j.setVolume(j.playListVolume, gain)
 				}
 			} else {
 				if internetRadioPlaying {
 					j.internetRadioVolume += gain
 					if isPlaying == `1` {
-						ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain) + "\n"
+						ctrl = `volume ` + j.setVolume(j.internetRadioVolume, gain)
 					}
 				} else {
 					j.randomListVolume += gain
 					if isPlaying == `1` {
-						ctrl = `volume ` + j.setVolume(j.randomListVolume, gain) + "\n"
+						ctrl = `volume ` + j.setVolume(j.randomListVolume, gain)
 					}
 				}
 			}
 		case <-ticker.C:
-			ctrl = "is_playing\n"
-		case isPlaying = <-output:
+			ctrl = "is_playing"
+		case isPlaying := <-output:
 			if isPlaying == `0` {
 				if singleSong != `` {
 					cmd.Process.Kill()

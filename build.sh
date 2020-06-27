@@ -12,5 +12,4 @@ cp -r -u img/* dist/img/.
 cp run.sh dist/.
 go build -o dist/jukebox
 strip dist/jukebox
-
-# GOARM=7 GOARCH=arm GOOS=linux CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc go build -o dist/jukebox_rpi
+GOARM=7 GOARCH=arm GOOS=linux CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc go build -o dist/jukebox_raspi
