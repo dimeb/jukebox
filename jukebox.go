@@ -116,12 +116,12 @@ func (j *Jukebox) play() {
 		case singleSong = <-j.singleSongToPlay:
 			ctrl = "clear\nloop off\nrepeat off\nrandom off\nvolume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + singleSong
 		case song := <-j.playListChannel:
-			ctrl = ``
 			if backgroundPlaying {
 				backgroundPlaying = false
-				ctrl = "clear\nloop off\nrepeat off\nrandom off\n"
+				ctrl = "clear\nloop off\nrepeat off\nrandom off\nvolume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + song
+			} else {
+				ctrl = "enqueue " + song
 			}
-			ctrl += "volume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + song
 		case <-j.randomListChanged:
 			lists.randomList()
 			if backgroundPlaying && !internetRadioPlaying {
@@ -191,7 +191,7 @@ func (j *Jukebox) play() {
 				if cfg.BackgroundMusic == `internet radio` {
 					if cfg.InternetRadioSelectedURL != `` {
 						internetRadioPlaying = true
-						s = "repeat off\nrandom off\nadd " + cfg.InternetRadioSelectedURL
+						s = "repeat off\nrandom off\nvolume " + j.setVolume(j.internetRadioVolume, 0) + "\nadd " + cfg.InternetRadioSelectedURL
 						logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
 					} else {
 						logger.queue <- `no station selected for playing internet radio`
@@ -199,7 +199,7 @@ func (j *Jukebox) play() {
 				}
 				if s == `` {
 					internetRadioPlaying = false
-					s = "repeat on\nrandom on\nadd " + lists.randomPlayListFile
+					s = "repeat on\nrandom on\nvolume " + j.setVolume(j.randomListVolume, 0) + "\nadd " + lists.randomPlayListFile
 					logger.queue <- `playing from random list`
 				}
 				ctrl = "clear\nloop off\n" + s

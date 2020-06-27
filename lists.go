@@ -152,11 +152,6 @@ func (l *Lists) load() error {
 		err = l.save()
 	}
 
-	_, e := os.Stat(l.randomPlayListFile)
-	if os.IsNotExist(e) {
-		l.randomList()
-	}
-
 	return err
 }
 

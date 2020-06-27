@@ -91,6 +91,10 @@ func main() {
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
 		}
+		_, err = os.Stat(lists.randomPlayListFile)
+		if os.IsNotExist(err) {
+			lists.randomList()
+		}
 		if lists.artworkInit() {
 			if err := lists.save(); err != nil {
 				logger.queue <- fmt.Sprint(err)
