@@ -191,7 +191,7 @@ func (j *Jukebox) play() {
 				if cfg.BackgroundMusic == `internet radio` {
 					if cfg.InternetRadioSelectedURL != `` {
 						internetRadioPlaying = true
-						s = "repeat off\nrandom off\nvolume " + j.setVolume(j.internetRadioVolume, 0) + "\nadd " + cfg.InternetRadioSelectedURL
+						s = "random off\nvolume " + j.setVolume(j.internetRadioVolume, 0) + "\nadd " + cfg.InternetRadioSelectedURL
 						logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
 					} else {
 						logger.queue <- `no station selected for playing internet radio`
@@ -199,10 +199,10 @@ func (j *Jukebox) play() {
 				}
 				if s == `` {
 					internetRadioPlaying = false
-					s = "repeat on\nrandom on\nvolume " + j.setVolume(j.randomListVolume, 0) + "\nadd " + lists.randomPlayListFile
+					s = "random on\nvolume " + j.setVolume(j.randomListVolume, 0) + "\nadd " + lists.randomPlayListFile
 					logger.queue <- `playing from random list`
 				}
-				ctrl = "clear\nloop off\n" + s
+				ctrl = "clear\nloop off\nrepeat off\n" + s
 			}
 		}
 
