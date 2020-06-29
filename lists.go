@@ -218,7 +218,7 @@ func (l Lists) checkSong(name string) bool {
 func (l Lists) randomList() {
 	var lst []string
 	if len(l.RandomList) > 0 {
-		copy(lst, l.RandomList)
+		lst = append(lst, l.RandomList...)
 	} else {
 		files, _ := ioutil.ReadDir(l.rootDir)
 		for _, file := range files {
