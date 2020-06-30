@@ -167,17 +167,19 @@ func (l Lists) save() error {
 // Returns a new Lists object, copy of the current Lists object.
 func (l Lists) copy() Lists {
 	var newL = Lists{
-		LabelContent:   l.LabelContent,
-		rootDir:        l.rootDir,
-		listsFile:      l.listsFile,
-		playListNumber: l.playListNumber,
+		LabelContent:       l.LabelContent,
+		labelWidth:         l.labelWidth,
+		labelHeight:        l.labelHeight,
+		rootDir:            l.rootDir,
+		listsFile:          l.listsFile,
+		playListNumber:     l.playListNumber,
+		artworkDir:         l.artworkDir,
+		randomPlayListFile: l.randomPlayListFile,
 	}
 
 	newL.RandomList = append(newL.RandomList, l.RandomList...)
 	newL.BrowseList = append(newL.BrowseList, l.BrowseList...)
-	newL.labelWidth = l.labelWidth
-	newL.labelHeight = l.labelHeight
-	newL.codecs = l.codecs
+	newL.codecs = append(newL.codecs, l.codecs...)
 	newL.labelContentOptions = l.labelContentOptions
 	newL.playListSongsPerSlot = l.playListSongsPerSlot
 
@@ -263,6 +265,10 @@ func (l Lists) randomList() {
 			}
 			return nil
 		})
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+		err = f.Sync()
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
 		}
@@ -399,6 +405,7 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 		if err == nil {
 			*l = newL.copy()
 			if randomListChanged {
+				l.randomList()
 				jukebox.randomListChanged <- true
 			}
 			if playListChanged {

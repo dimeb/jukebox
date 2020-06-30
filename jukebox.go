@@ -123,7 +123,6 @@ func (j *Jukebox) play() {
 				ctrl = "enqueue " + song
 			}
 		case <-j.randomListChanged:
-			lists.randomList()
 			logger.queue <- `random list changed`
 			if backgroundPlaying && !internetRadioPlaying {
 				logger.queue <- `playing from new random list`
