@@ -24,15 +24,11 @@
             <div class="btn btn-sm" onclick="checkAll('random_list',true)">{{.T.GetD `index` `Select all`}}</div>
             <div class="btn btn-sm" onclick="checkAll('random_list',false)">{{.T.GetD `index` `Deselect all`}}</div>
             </p>
-            <p class="random-browse-lists">
-            <br/>
             <div id="random-list" class="multiselect">
             {{range .Data.Lists.RandomList -}}
                 <div><input type="checkbox" name="random_list" value="{{.}}">&nbsp;{{.}}</div>
             {{end -}}
             </div>
-            <br/>
-            </p>
             <p>
             <div class="btn btn-sm" data-target="modal-container" onclick="addFolderSong(this);">{{.T.GetD `lists` `Add folder song`}}</div>
             <div class="btn btn-sm" onclick="deleteFolders('random-list');">{{.T.GetD `lists` `Delete folder song`}}</div>
@@ -120,15 +116,11 @@
             <div class="btn btn-sm" onclick="checkAll('browse_list',true)">{{.T.GetD `index` `Select all`}}</div>
             <div class="btn btn-sm" onclick="checkAll('browse_list',false)">{{.T.GetD `index` `Deselect all`}}</div>
             </p>
-            <p class="random-browse-lists">
-            <br/>
             <div id="browse-list" class="multiselect" style="max-height:none;">
             {{range .Data.Lists.BrowseList -}}
                 <div><input type="checkbox" name="browse_list" value="{{.}}">&nbsp;{{.}}</div>
             {{end -}}
             </div>
-            <br/>
-            </p>
             <p>
             <div class="btn btn-sm" data-target="modal-container" onclick="addFolder(this);">{{.T.GetD `lists` `Add folder`}}</div>
             <div class="btn btn-sm" onclick="deleteFolders('browse-list');">{{.T.GetD `lists` `Delete folder`}}</div>
