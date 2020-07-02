@@ -84,7 +84,7 @@ type Config struct {
 }
 
 var (
-	cfg Config = Config{
+	cfg = Config{
 		Debug:             1,
 		LogFile:           `jukebox.log`,
 		LogFileRotateSize: 1000000,
@@ -144,14 +144,6 @@ var (
 		},
 	}
 )
-
-func hash(s string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.MinCost)
-	if err != nil {
-		return ``, err
-	}
-	return string(hash), nil
-}
 
 // Read configuration from the configuration file, if exist.
 // If not, we have default values.
