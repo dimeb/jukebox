@@ -128,7 +128,8 @@ function spanClick() {
             if (!item.classList.contains('expanded')) {
                 if (elem = item.querySelector('legend')) {
                     elem.click();
-                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
                 }
             }
         }
