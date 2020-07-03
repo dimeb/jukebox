@@ -11,11 +11,14 @@ import (
 
 // Rclone structure.
 type Rclone struct {
-	clones    []*exec.Cmd
-	cmd       string
-	rcdURL    string
-	rcdArgs   []string
-	mountArgs []string
+	clones     []*exec.Cmd
+	cmd        string
+	rcdURL     string
+	rcdArgs    []string
+	listArgs   []string
+	mountArgs  []string
+	commonArgs []string
+	remotes    []string
 }
 
 var (
@@ -27,8 +30,15 @@ var (
 			`--rc-web-gui-no-open-browser`,
 			`--rc-addr="127.0.0.1:11000"`,
 		},
+		listArgs: []string{
+			`listremotes`,
+		},
 		mountArgs: []string{
 			`mount`,
+		},
+		commonArgs: []string{
+			`--config`,
+			`rclone.config`,
 		},
 	}
 )
@@ -36,10 +46,25 @@ var (
 func (r *Rclone) start() {
 	// Start rclone rcd.
 	go func() {
-		cmd, err := r.command(`rcd`)
-		if err != nil {
+		var err error
+
+		defer func() {
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+			}
+		}()
+
+		cmd := exec.Command(r.cmd, append(r.rcdArgs, r.commonArgs...)...)
+		cmd.Env = os.Environ()
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			// Pdeathsig: syscall.SIGKILL,
+			Pdeathsig: syscall.SIGTERM,
+		}
+
+		if err = cmd.Start(); err != nil {
 			return
 		}
+
 		stderr, err := cmd.StderrPipe()
 		if err != nil {
 			return
@@ -56,35 +81,15 @@ func (r *Rclone) start() {
 					}
 				}
 			}
-			if err := scanner.Err(); err != nil {
-				logger.queue <- fmt.Sprint(err)
-			}
+			err = scanner.Err()
 		}()
 	}()
-}
 
-func (r *Rclone) command(t string, args ...string) (*exec.Cmd, error) {
-	var cmd *exec.Cmd
-
-	commonArgs := []string{
-		`--config`,
-		`rclone.config`,
-	}
-	if t == `rcd` {
-		cmd = exec.Command(r.cmd, append(append(r.rcdArgs, args...), commonArgs...)...)
-	} else {
-		cmd = exec.Command(r.cmd, append(append(r.mountArgs, args...), commonArgs...)...)
-	}
-	cmd.Env = os.Environ()
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		// Pdeathsig: syscall.SIGKILL,
-		Pdeathsig: syscall.SIGTERM,
-	}
-
-	if err := cmd.Start(); err != nil {
+	// Get remotes.
+	b, err := exec.Command(r.cmd, append(r.listArgs, r.commonArgs...)...).Output()
+	if err != nil {
 		logger.queue <- fmt.Sprint(err)
-		return nil, err
+	} else {
+		r.remotes = strings.Split(string(b), "\n")
 	}
-
-	return cmd, nil
 }
