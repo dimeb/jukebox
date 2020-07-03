@@ -44,7 +44,7 @@ var (
 )
 
 func (r *Rclone) start() {
-	// Start rclone rcd.
+	// Start rcd.
 	go func() {
 		var err error
 
@@ -69,6 +69,7 @@ func (r *Rclone) start() {
 		if err != nil {
 			return
 		}
+
 		go func() {
 			s := ``
 			scanner := bufio.NewScanner(stderr)
@@ -91,5 +92,29 @@ func (r *Rclone) start() {
 		logger.queue <- fmt.Sprint(err)
 	} else {
 		r.remotes = strings.Split(string(b), "\n")
+	}
+
+	// Mount remotes.
+	for _, rem := range r.remotes {
+		remote := rem
+		go func() {
+			var err error
+
+			defer func() {
+				if err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
+			}()
+
+			mountDir := lists.rootDir + `/` + strings.TrimSuffix(remote, `:`)
+			args := append(r.mountArgs, remote, mountDir)
+			args = append(args, r.commonArgs...)
+			cmd := exec.Command(r.cmd, args...)
+			cmd.Env = os.Environ()
+			cmd.SysProcAttr = &syscall.SysProcAttr{
+				// Pdeathsig: syscall.SIGKILL,
+				Pdeathsig: syscall.SIGTERM,
+			}
+		}()
 	}
 }
