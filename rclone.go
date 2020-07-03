@@ -54,6 +54,7 @@ func (r *Rclone) start() {
 			}
 		}()
 
+		logger.queue <- fmt.Sprint(`starting rclone web config ...`)
 		cmd := exec.Command(r.cmd, append(r.rcdArgs, r.commonArgs...)...)
 		cmd.Env = os.Environ()
 		cmd.SysProcAttr = &syscall.SysProcAttr{
@@ -87,6 +88,7 @@ func (r *Rclone) start() {
 	}()
 
 	// Get remotes.
+	logger.queue <- fmt.Sprint(`getting rclone remotes ...`)
 	b, err := exec.Command(r.cmd, append(r.listArgs, r.commonArgs...)...).Output()
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
@@ -107,6 +109,7 @@ func (r *Rclone) start() {
 			}()
 
 			mountDir := lists.rootDir + `/` + strings.TrimSuffix(remote, `:`)
+			logger.queue <- fmt.Sprintf(`mounting rclone remote %s to %s ...`, remote, mountDir)
 			args := append(r.mountArgs, remote, mountDir)
 			args = append(args, r.commonArgs...)
 			cmd := exec.Command(r.cmd, args...)
