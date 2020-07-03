@@ -110,7 +110,7 @@ func (r *Rclone) start() {
 
 			mountDir := lists.rootDir + `/` + strings.TrimSuffix(remote, `:`)
 			logger.queue <- fmt.Sprintf(`mounting rclone remote %s to %s ...`, remote, mountDir)
-			args := append(r.mountArgs, remote, mountDir)
+			args := append(r.mountArgs, remote, mountDir, `--read-only`)
 			args = append(args, r.commonArgs...)
 			cmd := exec.Command(r.cmd, args...)
 			cmd.Env = os.Environ()
