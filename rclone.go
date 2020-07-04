@@ -12,6 +12,8 @@ import (
 // Rclone structure.
 type Rclone struct {
 	clones     []*exec.Cmd
+	folderID   string
+	mountID    string
 	cmd        string
 	rcdURL     string
 	rcdArgs    []string
@@ -19,11 +21,14 @@ type Rclone struct {
 	mountArgs  []string
 	commonArgs []string
 	remotes    []string
+	drives     []string
 }
 
 var (
 	rclone = Rclone{
-		cmd: `rclone`,
+		folderID: `Music`,
+		mountID:  `Local`,
+		cmd:      `rclone`,
 		rcdArgs: []string{
 			`rcd`,
 			`--rc-web-gui`,

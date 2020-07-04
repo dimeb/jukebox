@@ -4,16 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	flagFile           string
-	flagHashString     string
-	flagHtpasswdString string
-	flagDefaultConfig  bool
+	flagFile          string
+	flagHashString    string
+	flagDefaultConfig bool
 )
 
 func init() {
@@ -26,7 +24,6 @@ func init() {
 	}
 	flag.StringVar(&flagFile, `file`, ``, `Specify single audio file to play.`)
 	flag.StringVar(&flagHashString, `hash`, ``, `Hash the given string.`)
-	flag.StringVar(&flagHtpasswdString, `htpasswd`, ``, `Returns htpasswd string for given user:cleartext_password string.`)
 	flag.BoolVar(&flagDefaultConfig, `default_config`, false, `Create configuration file from built-in configuration.`)
 }
 
@@ -55,17 +52,6 @@ func main() {
 			fmt.Printf("\"%s\" %+v\n", s, err)
 		} else {
 			fmt.Print(s)
-		}
-		os.Exit(0)
-	}
-
-	if flagHtpasswdString != `` {
-		a := strings.Split(flagHtpasswdString, `:`)
-		s, err := hash(a[1])
-		if err != nil {
-			fmt.Printf("\"%s\" %+v\n", s, err)
-		} else {
-			fmt.Printf("%s:%s\n", a[0], s)
 		}
 		os.Exit(0)
 	}
@@ -107,6 +93,9 @@ func main() {
 		// Open internet radio database.
 		internetRadio = NewInternetRadio()
 		defer internetRadio.closeDB()
+
+		// Start rclone.
+		rclone.start()
 
 		// Start web administration.
 		webAdmin = NewWebAdmin()

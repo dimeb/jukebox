@@ -1,21 +1,42 @@
 #!/bin/bash
 
-export LOCAL_DIR=Music/Local
-mkdir -p $PWD/$LOCAL_DIR
+declare -a DRIVES
+export DRIVES
+declare -a MOUNTED
+export MOUNTED
+function exit_handler_mount() {
+  for d in ${MOUNTED[@]}; do
+    pumount /mnt/$d
+  done
+}
 
 MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
   if [[ -z "${SSH_TTY}" ]]; then
-    pumount /dev/sda1
-    pmount /dev/sda1 $PWD/$LOCAL_DIR || exit 1
+    lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
+      mkdir -p /mnt/$drive
+      pmount /dev/$drive /mnt/$drive
+      if [ $? -eq 0 ] && [ -d /mnt/$drive/Music ]; then
+        $MOUNTED+=( $drive )
+        $DRIVES+=( /mnt/$drive/Music )
+      fi
+    done
   else
     exit 0
   fi
-  function exit_handler_mount { pumount /dev/sda1; }
 else
-  sudo mount --bind /home/dime/Music/ $PWD/$LOCAL_DIR || exit 1
-  function exit_handler_mount { sudo umount $PWD/$LOCAL_DIR; }
+  if [ -d $HOME/Music ]; then
+    $DRIVES+=( $HOME/Music )
+  fi 
 fi
+export RCLONE_CONFIG="--config rclone.config"
+rclone listremotes $RCLONE_CONFIG | grep ^Local | cut -d ":" -f 1 | while read remote ; do
+  rclone config delete $remote $RCLONE_CONFIG
+done
+for i in ${!DRIVES[@]}; do
+  mkdir -p Music/${DRIVES[$i]}
+  rclone config create Local$i alias remote ${DRIVES[$i]} $RCLONE_CONFIG
+done
 
 export JUKEBOX=./jukebox
 export JUKEBOX_ERR_FILE=./jukebox.err
