@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	"time"
 )
 
 // Rclone structure.
@@ -15,66 +16,21 @@ type Rclone struct {
 	cmd        string
 	configFile string
 	rcdURL     string
+	rcd        *exec.Cmd
+	mounts     map[string]*exec.Cmd
 }
 
 var (
 	rclone = Rclone{
 		cmd:        `rclone`,
 		configFile: `rclone.config`,
+		mounts:     make(map[string]*exec.Cmd),
 	}
 )
 
 func (r *Rclone) start() {
 	// Start rcd.
-	go func() {
-		var err error
-
-		defer func() {
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-			}
-		}()
-
-		logger.queue <- fmt.Sprint(`starting rclone web config ...`)
-		cmd := exec.Command(
-			r.cmd,
-			`rcd`,
-			`--rc-web-gui`,
-			`--rc-web-gui-no-open-browser`,
-			`--rc-addr="127.0.0.1:11000"`,
-			`--config`,
-			r.configFile,
-		)
-		cmd.Env = os.Environ()
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			// Pdeathsig: syscall.SIGKILL,
-			Pdeathsig: syscall.SIGTERM,
-		}
-
-		if err = cmd.Start(); err != nil {
-			return
-		}
-
-		stderr, err := cmd.StderrPipe()
-		if err != nil {
-			return
-		}
-
-		go func() {
-			s := ``
-			scanner := bufio.NewScanner(stderr)
-			for scanner.Scan() {
-				s = scanner.Text()
-				if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
-					a := strings.Split(s, ` `)
-					if len(a) > 2 {
-						r.rcdURL = a[len(a)-2]
-					}
-				}
-			}
-			err = scanner.Err()
-		}()
-	}()
+	go r.startRcd()
 
 	// Mount remotes.
 	for _, rem := range r.getRemotes() {
@@ -115,6 +71,64 @@ func (r *Rclone) start() {
 	}
 
 	r.checkLists()
+}
+
+func (r *Rclone) startRcd() {
+	var err error
+
+	defer func() {
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+	}()
+
+	logger.queue <- fmt.Sprint(`starting rclone web config ...`)
+	r.rcd = exec.Command(
+		r.cmd,
+		`rcd`,
+		`--rc-web-gui`,
+		`--rc-web-gui-no-open-browser`,
+		`--rc-addr="127.0.0.1:11000"`,
+		`--config`,
+		r.configFile,
+	)
+	r.rcd.Env = os.Environ()
+	r.rcd.SysProcAttr = &syscall.SysProcAttr{
+		// Pdeathsig: syscall.SIGKILL,
+		Pdeathsig: syscall.SIGTERM,
+	}
+
+	if err = r.rcd.Start(); err != nil {
+		return
+	}
+
+	stderr, err := r.rcd.StderrPipe()
+	if err != nil {
+		return
+	}
+
+	b := false
+	scanner := bufio.NewScanner(stderr)
+	for scanner.Scan() {
+		if b {
+			break
+		}
+		s := scanner.Text()
+		if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
+			a := strings.Split(s, ` `)
+			if len(a) > 2 {
+				r.rcdURL = a[len(a)-2]
+			}
+			b = true
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		logger.queue <- fmt.Sprint(err)
+	}
+	r.rcdURL = ``
+	stderr.Close()
+	r.rcd.Process.Kill()
+	time.Sleep(1 * time.Second)
 }
 
 func (r *Rclone) getRemotes() (remotes []string) {
