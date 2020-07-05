@@ -5,46 +5,22 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"syscall"
 )
 
 // Rclone structure.
 type Rclone struct {
-	clones     []*exec.Cmd
-	folderID   string
-	mountID    string
 	cmd        string
+	configFile string
 	rcdURL     string
-	rcdArgs    []string
-	listArgs   []string
-	mountArgs  []string
-	commonArgs []string
-	remotes    []string
-	drives     []string
 }
 
 var (
 	rclone = Rclone{
-		folderID: `Music`,
-		mountID:  `Local`,
-		cmd:      `rclone`,
-		rcdArgs: []string{
-			`rcd`,
-			`--rc-web-gui`,
-			`--rc-web-gui-no-open-browser`,
-			`--rc-addr="127.0.0.1:11000"`,
-		},
-		listArgs: []string{
-			`listremotes`,
-		},
-		mountArgs: []string{
-			`mount`,
-		},
-		commonArgs: []string{
-			`--config`,
-			`rclone.config`,
-		},
+		cmd:        `rclone`,
+		configFile: `rclone.config`,
 	}
 )
 
@@ -60,7 +36,15 @@ func (r *Rclone) start() {
 		}()
 
 		logger.queue <- fmt.Sprint(`starting rclone web config ...`)
-		cmd := exec.Command(r.cmd, append(r.rcdArgs, r.commonArgs...)...)
+		cmd := exec.Command(
+			r.cmd,
+			`rcd`,
+			`--rc-web-gui`,
+			`--rc-web-gui-no-open-browser`,
+			`--rc-addr="127.0.0.1:11000"`,
+			`--config`,
+			r.configFile,
+		)
 		cmd.Env = os.Environ()
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			// Pdeathsig: syscall.SIGKILL,
@@ -92,17 +76,8 @@ func (r *Rclone) start() {
 		}()
 	}()
 
-	// Get remotes.
-	logger.queue <- fmt.Sprint(`getting rclone remotes ...`)
-	b, err := exec.Command(r.cmd, append(r.listArgs, r.commonArgs...)...).Output()
-	if err != nil {
-		logger.queue <- fmt.Sprint(err)
-	} else {
-		r.remotes = strings.Split(string(b), "\n")
-	}
-
 	// Mount remotes.
-	for _, rem := range r.remotes {
+	for _, rem := range r.getRemotes() {
 		remote := rem
 		go func() {
 			var err error
@@ -113,16 +88,72 @@ func (r *Rclone) start() {
 				}
 			}()
 
-			mountDir := lists.rootDir + `/` + strings.TrimSuffix(remote, `:`)
+			mountDir := lists.rootDir + remote
 			logger.queue <- fmt.Sprintf(`mounting rclone remote %s to %s ...`, remote, mountDir)
-			args := append(r.mountArgs, remote, mountDir, `--read-only`)
-			args = append(args, r.commonArgs...)
-			cmd := exec.Command(r.cmd, args...)
+			if err = os.MkdirAll(mountDir, 0755); err != nil {
+				return
+			}
+			cmd := exec.Command(
+				r.cmd,
+				`mount`,
+				remote,
+				mountDir,
+				`--read-only`,
+				`--config`,
+				r.configFile,
+			)
 			cmd.Env = os.Environ()
 			cmd.SysProcAttr = &syscall.SysProcAttr{
 				// Pdeathsig: syscall.SIGKILL,
 				Pdeathsig: syscall.SIGTERM,
 			}
+			if err = cmd.Run(); err != nil {
+				logger.queue <- fmt.Sprint(err)
+			}
+			err = os.Remove(mountDir)
 		}()
+	}
+
+	r.checkLists()
+}
+
+func (r *Rclone) getRemotes() (remotes []string) {
+	logger.queue <- fmt.Sprint(`getting rclone remotes ...`)
+	b, err := exec.Command(r.cmd, `listremotes`, `--config`, r.configFile).Output()
+	if err != nil {
+		logger.queue <- fmt.Sprint(err)
+	} else {
+		remotes = strings.Split(string(b), ":\n")
+	}
+	return
+}
+
+func (r *Rclone) checkLists() {
+	var err error
+
+	defer func() {
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+	}()
+
+	mounts := []string{}
+	remotes := r.getRemotes()
+
+	d, err := os.Open(lists.rootDir)
+	if err != nil {
+		return
+	}
+	defer d.Close()
+
+	files, err := d.Readdir(-1)
+	if err != nil {
+		return
+	}
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		mounts = append(mounts, path.Base(file.Name()))
 	}
 }
