@@ -89,9 +89,7 @@ done
 if [[ $MACHINE == arm* ]]; then
   mkdir -p $HOME/.config/openbox
   AUTOSTART=$HOME/.config/openbox/autostart
-  echo "xset -dpms		# turn off display power management system" > $AUTOSTART
-  echo "xset s noblank		# turn off screen blanking" >> $AUTOSTART
-  echo "xset s off		# turn off screen saver" >> $AUTOSTART
+  echo -e "xset -dpms\nxset s noblank\nxset s off\nsetxkbmap -option terminate:ctrl_alt_bksp" > $AUTOSTART
   echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> $AUTOSTART
   echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> $AUTOSTART
   echo $EXE >> $AUTOSTART
