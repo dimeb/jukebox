@@ -12,6 +12,11 @@ function exit_handler_mount() {
 
 MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
+  echo "xset -dpms		# turn off display power management system" > $HOME/.config/openbox/autostart
+  echo "xset s noblank		# turn off screen blanking" >> $HOME/.config/openbox/autostart
+  echo "xset s off		# turn off screen saver" >> $HOME/.config/openbox/autostart
+  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> $HOME/.config/openbox/autostart
+  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> $HOME/.config/openbox/autostart
   if [[ -z "${SSH_TTY}" ]]; then
     lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
       mkdir -p /mnt/$drive
@@ -65,28 +70,33 @@ if [ "$JUKEBOX_MONITORS" != "1" ]; then
   JUKEBOX_DISPLAY="--window-position=1920,0"
 fi
 
+JUKEBOX_KIOSK_USER_DATA_DIR=$PWD/kiosk
+mkdir -p $JUKEBOX_KIOSK_USER_DATA_DIR
+
 EXE=
 for exe in \
-  chrome \
+  /usr/bin/chrome \
   /opt/google/chrome/chrome \
-  chromium \
-  chromium-browser
+  /usr/bin/chromium \
+  /usr/bin/chromium-browser
 do
-  if [ -x "$(command -v ${exe})" ]; then
-    EXE=$exe
+  if [ -x $exe ]; then
+    EXE="$exe --kiosk --incognito --noerrdialogs --disable-infobars --disable-gpu --no-default-browser-check --user-data-dir=$JUKEBOX_KIOSK_USER_DATA_DIR $JUKEBOX_DISPLAY http://$JUKEBOX_KIOSK/app"
     break
   fi
 done
 
-JUKEBOX_KIOSK_USER_DATA_DIR=$PWD/kiosk
-mkdir -p $JUKEBOX_KIOSK_USER_DATA_DIR
-$EXE \
-  --kiosk \
-  --incognito \
-  --noerrdialogs \
-  --disable-infobars \
-  --disable-gpu \
-  --no-default-browser-check \
-  --user-data-dir=$JUKEBOX_KIOSK_USER_DATA_DIR \
-  $JUKEBOX_DISPLAY http://$JUKEBOX_KIOSK/app
+if [[ $MACHINE == arm* ]]; then
+  mkdir -p $HOME/.config/openbox
+  AUTOSTART=$HOME/.config/openbox/autostart
+  echo "xset -dpms		# turn off display power management system" > $AUTOSTART
+  echo "xset s noblank		# turn off screen blanking" >> $AUTOSTART
+  echo "xset s off		# turn off screen saver" >> $AUTOSTART
+  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> $AUTOSTART
+  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> $AUTOSTART
+  echo $EXE >> $AUTOSTART
+  startx -- -nocursor
+else
+  $EXE
+fi
 
