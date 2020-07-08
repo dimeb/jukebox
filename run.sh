@@ -1,9 +1,12 @@
 #!/bin/bash
 
+export JUKEBOX_SH_PID=$$
+
 declare -a DRIVES
 export DRIVES
 declare -a MOUNTED
 export MOUNTED
+
 function exit_handler_mount() {
   for d in ${MOUNTED[@]}; do
     pumount /mnt/$d
@@ -16,9 +19,9 @@ if [[ $MACHINE == arm* ]]; then
     lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
       mkdir -p /mnt/$drive
       pmount /dev/$drive /mnt/$drive
-      if [ $? -eq 0 ] && [ -d /mnt/$drive/Music ]; then
+      if [ $? -eq 0 ]; then
         $MOUNTED+=( $drive )
-        $DRIVES+=( /mnt/$drive/Music )
+        $DRIVES+=( /mnt/$drive )
       fi
     done
   else
@@ -29,13 +32,12 @@ else
     $DRIVES+=( $HOME/Music )
   fi 
 fi
-export RCLONE_CONFIG="--config rclone.config"
-rclone listremotes $RCLONE_CONFIG | grep ^Local | cut -d ":" -f 1 | while read remote ; do
-  rclone config delete $remote $RCLONE_CONFIG
+rclone listremotes | grep ^Local | cut -d ":" -f 1 | while read remote ; do
+  rclone config delete $remote
 done
 for i in ${!DRIVES[@]}; do
   mkdir -p Music/${DRIVES[$i]}
-  rclone config create Local$i alias remote ${DRIVES[$i]} $RCLONE_CONFIG
+  rclone config create Local$i alias remote ${DRIVES[$i]}
 done
 
 export JUKEBOX=./jukebox
