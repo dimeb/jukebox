@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
 	"syscall"
 	"time"
@@ -13,18 +12,18 @@ import (
 
 // Rclone structure.
 type Rclone struct {
-	cmd        string
-	configFile string
-	rcdURL     string
-	rcd        *exec.Cmd
-	mounts     map[string]*exec.Cmd
+	cmd              string
+	rcdURL           string
+	rcd              *exec.Cmd
+	mounts           map[string]*exec.Cmd
+	checkMountPeriod time.Duration
 }
 
 var (
 	rclone = Rclone{
-		cmd:        `rclone`,
-		configFile: `rclone.config`,
-		mounts:     make(map[string]*exec.Cmd),
+		cmd:              `rclone`,
+		mounts:           make(map[string]*exec.Cmd),
+		checkMountPeriod: 30 * time.Second,
 	}
 )
 
@@ -55,8 +54,6 @@ func (r *Rclone) start() {
 				remote,
 				mountDir,
 				`--read-only`,
-				`--config`,
-				r.configFile,
 			)
 			cmd.Env = os.Environ()
 			cmd.SysProcAttr = &syscall.SysProcAttr{
@@ -89,8 +86,6 @@ func (r *Rclone) startRcd() {
 		`--rc-web-gui`,
 		`--rc-web-gui-no-open-browser`,
 		`--rc-addr="127.0.0.1:11000"`,
-		`--config`,
-		r.configFile,
 	)
 	r.rcd.Env = os.Environ()
 	r.rcd.SysProcAttr = &syscall.SysProcAttr{
@@ -133,7 +128,7 @@ func (r *Rclone) startRcd() {
 
 func (r *Rclone) getRemotes() (remotes []string) {
 	logger.queue <- fmt.Sprint(`getting rclone remotes ...`)
-	b, err := exec.Command(r.cmd, `listremotes`, `--config`, r.configFile).Output()
+	b, err := exec.Command(r.cmd, `listremotes`).Output()
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
 	} else {
@@ -142,32 +137,39 @@ func (r *Rclone) getRemotes() (remotes []string) {
 	return
 }
 
-func (r *Rclone) checkLists() {
-	var err error
+func (r *Rclone) checkRemote(remote string) bool {
+	_, err := exec.Command(r.cmd, `size`, remote+`:`).Output()
+	return err == nil
+}
 
-	defer func() {
-		if err != nil {
-			logger.queue <- fmt.Sprint(err)
-		}
-	}()
-
-	mounts := []string{}
-	remotes := r.getRemotes()
-
-	d, err := os.Open(lists.rootDir)
-	if err != nil {
-		return
+// True if remote is valid directory under lists.rootDir and is not empty.
+// False in case of any error or empty.
+func (r *Rclone) checkMount(remote string) bool {
+	mountPoint := lists.rootDir + remote
+	mount, err := os.Stat(mountPoint)
+	if err != nil || !mount.IsDir() {
+		return false
 	}
-	defer d.Close()
-
-	files, err := d.Readdir(-1)
+	f, err := os.Open(mountPoint)
 	if err != nil {
-		return
+		return false
 	}
-	for _, file := range files {
-		if !file.IsDir() {
+	defer f.Close()
+	_, err = f.Readdir(1)
+	return err == nil
+}
+
+func (r *Rclone) checkMounts() {
+	for remote, cmd := range r.mounts {
+		mountPoint := lists.rootDir + remote
+		if r.checkMount(remote) {
 			continue
 		}
-		mounts = append(mounts, path.Base(file.Name()))
+		cmd.Process.Kill()
+		exec.Command(`/bin/fusermount`, `-u`, mountPoint).Run()
+		os.Remove(mountPoint)
 	}
+}
+
+func (r *Rclone) checkLists() {
 }

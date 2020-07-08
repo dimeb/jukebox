@@ -12,11 +12,6 @@ function exit_handler_mount() {
 
 MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
-  echo "xset -dpms		# turn off display power management system" > $HOME/.config/openbox/autostart
-  echo "xset s noblank		# turn off screen blanking" >> $HOME/.config/openbox/autostart
-  echo "xset s off		# turn off screen saver" >> $HOME/.config/openbox/autostart
-  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> $HOME/.config/openbox/autostart
-  echo -e "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> $HOME/.config/openbox/autostart
   if [[ -z "${SSH_TTY}" ]]; then
     lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
       mkdir -p /mnt/$drive
