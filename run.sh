@@ -39,6 +39,12 @@ for i in ${!DRIVES[@]}; do
   mkdir -p Music/${DRIVES[$i]}
   rclone config create Local$i alias remote ${DRIVES[$i]}
 done
+rclone listremotes | cut -d ":" -f 1 | while read remote ; do
+  fusermount -u Music/$remote
+  sleep 0.5
+  rm -rf Music/$remote
+  rclone size $remote && mkdir -p Music/$remote && rclone mount $remote Music/$remote --daemon --read-only
+done
 
 export JUKEBOX=./jukebox
 export JUKEBOX_ERR_FILE=./jukebox.err

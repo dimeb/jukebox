@@ -14,7 +14,6 @@ import (
 type Rclone struct {
 	cmd              string
 	rcdURL           string
-	rcd              *exec.Cmd
 	mounts           map[string]*exec.Cmd
 	checkMountPeriod time.Duration
 }
@@ -28,10 +27,93 @@ var (
 )
 
 func (r *Rclone) start() {
-	// Start rcd.
-	go r.startRcd()
+	// Start/restart rcd.
+	go func() {
+		for {
+			logger.queue <- fmt.Sprint(`starting rclone web config ...`)
+			rcd := exec.Command(
+				r.cmd,
+				`rcd`,
+				`--rc-web-gui`,
+				`--rc-web-gui-no-open-browser`,
+				`--rc-addr="127.0.0.1:11000"`,
+			)
+			rcd.Env = os.Environ()
+			rcd.SysProcAttr = &syscall.SysProcAttr{
+				// Pdeathsig: syscall.SIGKILL,
+				Pdeathsig: syscall.SIGTERM,
+			}
+			err := rcd.Start()
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+			} else {
+				stderr, err := rcd.StderrPipe()
+				if err != nil {
+					logger.queue <- fmt.Sprint(err)
+				} else {
+					b := false
+					scanner := bufio.NewScanner(stderr)
+					for scanner.Scan() {
+						if b {
+							break
+						}
+						s := scanner.Text()
+						if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
+							a := strings.Split(s, ` `)
+							if len(a) > 2 {
+								r.rcdURL = a[len(a)-2]
+							}
+							b = true
+						}
+					}
+					if err = scanner.Err(); err != nil {
+						logger.queue <- fmt.Sprint(err)
+					}
+					r.rcdURL = ``
+					stderr.Close()
+				}
+			}
+			rcd.Process.Kill()
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	unmounted := make(chan bool)
 
 	// Mount remotes.
+	go r.mount(unmounted)
+
+	// Unmount everything unconditionally.
+	dir, err := os.Open(lists.rootDir)
+	if err != nil {
+		logger.queue <- fmt.Sprint(err)
+	} else {
+		defer dir.Close()
+		files, err := dir.Readdir(-1)
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+		for _, file := range files {
+			p := lists.rootDir + file.Name()
+			if file.IsDir() {
+				err = r.unmount(p)
+				if err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
+			}
+			err = os.Remove(p)
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+			}
+		}
+	}
+	unmounted <- true
+
+	r.checkLists()
+}
+
+func (r *Rclone) mount(c chan bool) {
+	<-c
 	for _, rem := range r.getRemotes() {
 		remote := rem
 		go func() {
@@ -66,64 +148,10 @@ func (r *Rclone) start() {
 			err = os.Remove(mountDir)
 		}()
 	}
-
-	r.checkLists()
 }
 
-func (r *Rclone) startRcd() {
-	var err error
-
-	defer func() {
-		if err != nil {
-			logger.queue <- fmt.Sprint(err)
-		}
-	}()
-
-	logger.queue <- fmt.Sprint(`starting rclone web config ...`)
-	r.rcd = exec.Command(
-		r.cmd,
-		`rcd`,
-		`--rc-web-gui`,
-		`--rc-web-gui-no-open-browser`,
-		`--rc-addr="127.0.0.1:11000"`,
-	)
-	r.rcd.Env = os.Environ()
-	r.rcd.SysProcAttr = &syscall.SysProcAttr{
-		// Pdeathsig: syscall.SIGKILL,
-		Pdeathsig: syscall.SIGTERM,
-	}
-
-	if err = r.rcd.Start(); err != nil {
-		return
-	}
-
-	stderr, err := r.rcd.StderrPipe()
-	if err != nil {
-		return
-	}
-
-	b := false
-	scanner := bufio.NewScanner(stderr)
-	for scanner.Scan() {
-		if b {
-			break
-		}
-		s := scanner.Text()
-		if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
-			a := strings.Split(s, ` `)
-			if len(a) > 2 {
-				r.rcdURL = a[len(a)-2]
-			}
-			b = true
-		}
-	}
-	if err = scanner.Err(); err != nil {
-		logger.queue <- fmt.Sprint(err)
-	}
-	r.rcdURL = ``
-	stderr.Close()
-	r.rcd.Process.Kill()
-	time.Sleep(1 * time.Second)
+func (r *Rclone) unmount(dir string) error {
+	return exec.Command(`fusermount`, `-u`, dir).Run()
 }
 
 func (r *Rclone) getRemotes() (remotes []string) {
