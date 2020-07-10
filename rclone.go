@@ -151,7 +151,19 @@ func (r *Rclone) mount(c chan bool) {
 }
 
 func (r *Rclone) unmount(dir string) error {
-	return exec.Command(`fusermount`, `-u`, dir).Run()
+	var err error
+
+	defer func() {
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+	}()
+
+	err = exec.Command(`fusermount`, `-u`, dir).Run()
+	if err == nil {
+		err = os.Remove(dir)
+	}
+	return err
 }
 
 func (r *Rclone) getRemotes() (remotes []string) {
@@ -166,8 +178,11 @@ func (r *Rclone) getRemotes() (remotes []string) {
 }
 
 func (r *Rclone) checkRemote(remote string) bool {
-	_, err := exec.Command(r.cmd, `size`, remote+`:`).Output()
-	return err == nil
+	if err := exec.Command(r.cmd, `size`, remote+`:`).Run(); err != nil {
+		r.unmount(lists.rootDir + remote)
+		return false
+	}
+	return true
 }
 
 // True if remote is valid directory under lists.rootDir and is not empty.
