@@ -113,12 +113,15 @@ func (j *Jukebox) play() {
 	isPlaying := `0`
 	backgroundPlaying := false
 	internetRadioPlaying := false
-	stopPlaying := false
+	stopPlaying := 0
 	for {
 		select {
 		case singleSong = <-j.singleSongToPlay:
 			ctrl = "clear\nloop off\nrepeat off\nrandom off\nvolume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + singleSong
 		case song := <-j.playListChannel:
+			if stopPlaying > 0 {
+				continue
+			}
 			if backgroundPlaying {
 				backgroundPlaying = false
 				ctrl = "clear\nloop off\nrepeat off\nrandom off\nvolume " + j.setVolume(cfg.PlayListVolume, 0) + "\nadd " + song
@@ -166,11 +169,6 @@ func (j *Jukebox) play() {
 			}
 		case gain := <-jukebox.currentAudioVolumeChannel:
 			if backgroundPlaying {
-				j.playListVolume += gain
-				if isPlaying == `1` {
-					ctrl = `volume ` + j.setVolume(j.playListVolume, gain)
-				}
-			} else {
 				if internetRadioPlaying {
 					j.internetRadioVolume += gain
 					if isPlaying == `1` {
@@ -182,22 +180,33 @@ func (j *Jukebox) play() {
 						ctrl = `volume ` + j.setVolume(j.randomListVolume, gain)
 					}
 				}
+			} else {
+				j.playListVolume += gain
+				if isPlaying == `1` {
+					ctrl = `volume ` + j.setVolume(j.playListVolume, gain)
+				}
 			}
-		case stopPlaying = <-j.stopPlayingChannel:
-			if stopPlaying {
+		case b := <-j.stopPlayingChannel:
+			if b {
+				stopPlaying = 1
 				ctrl = "clear"
+			} else {
+				stopPlaying = 0
 			}
 		case <-ticker.C:
 			ctrl = "is_playing"
 		case isPlaying = <-output:
 			if isPlaying == `0` {
+				if stopPlaying > 0 {
+					if stopPlaying == 1 {
+						rclone.playingStopped <- true
+					}
+					stopPlaying++
+					continue
+				}
 				if singleSong != `` {
 					cmd.Process.Kill()
 					return
-				}
-				if stopPlaying {
-					rclone.playingStopped <- true
-					continue
 				}
 				backgroundPlaying = true
 				s := ``
