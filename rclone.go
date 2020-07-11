@@ -14,6 +14,7 @@ import (
 type Rclone struct {
 	cmd              string
 	rcdURL           string
+	playingStopped   chan bool
 	mounts           map[string]*exec.Cmd
 	checkMountPeriod time.Duration
 }
@@ -21,6 +22,7 @@ type Rclone struct {
 var (
 	rclone = Rclone{
 		cmd:              `rclone`,
+		playingStopped:   make(chan bool),
 		mounts:           make(map[string]*exec.Cmd),
 		checkMountPeriod: 30 * time.Second,
 	}

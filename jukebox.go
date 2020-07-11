@@ -26,22 +26,24 @@ type Jukebox struct {
 	backgroundMusicChanged     chan bool
 	randomListChanged          chan bool
 	currentAudioVolumeChannel  chan int
+	stopPlayingChannel         chan bool
 }
 
 var (
 	jukebox = Jukebox{
 		singleSongToPlay:           make(chan string, 1),
 		randomListVolume:           cfg.RandomListVolume,
-		randomListVolumeChannel:    make(chan int, 1),
+		randomListVolumeChannel:    make(chan int, 10),
 		playListVolume:             cfg.PlayListVolume,
-		playListVolumeChannel:      make(chan int, 1),
+		playListVolumeChannel:      make(chan int, 10),
 		playListChannel:            make(chan string, 2048),
 		internetRadioVolume:        cfg.InternetRadioVolume,
-		internetRadioVolumeChannel: make(chan int, 1),
+		internetRadioVolumeChannel: make(chan int, 10),
 		internetRadioChanged:       make(chan bool, 1),
 		backgroundMusicChanged:     make(chan bool, 1),
-		randomListChanged:          make(chan bool),
-		currentAudioVolumeChannel:  make(chan int),
+		randomListChanged:          make(chan bool, 1),
+		currentAudioVolumeChannel:  make(chan int, 10),
+		stopPlayingChannel:         make(chan bool, 1),
 	}
 )
 
@@ -111,6 +113,7 @@ func (j *Jukebox) play() {
 	isPlaying := `0`
 	backgroundPlaying := false
 	internetRadioPlaying := false
+	stopPlaying := false
 	for {
 		select {
 		case singleSong = <-j.singleSongToPlay:
@@ -180,13 +183,21 @@ func (j *Jukebox) play() {
 					}
 				}
 			}
+		case stopPlaying = <-j.stopPlayingChannel:
+			if stopPlaying {
+				ctrl = "clear"
+			}
 		case <-ticker.C:
 			ctrl = "is_playing"
-		case isPlaying := <-output:
+		case isPlaying = <-output:
 			if isPlaying == `0` {
 				if singleSong != `` {
 					cmd.Process.Kill()
 					return
+				}
+				if stopPlaying {
+					rclone.playingStopped <- true
+					continue
 				}
 				backgroundPlaying = true
 				s := ``
