@@ -56,9 +56,6 @@ func (r *Rclone) start() {
 					b := false
 					scanner := bufio.NewScanner(stderr)
 					for scanner.Scan() {
-						if b {
-							break
-						}
 						s := scanner.Text()
 						if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
 							a := strings.Split(s, ` `)
@@ -66,12 +63,15 @@ func (r *Rclone) start() {
 								r.rcdURL = a[len(a)-2]
 							}
 							b = true
+						} else {
+							if b {
+								break
+							}
 						}
 					}
 					if err = scanner.Err(); err != nil {
 						logger.queue <- fmt.Sprint(err)
 					}
-					r.rcdURL = ``
 					stderr.Close()
 				}
 			}
@@ -98,10 +98,7 @@ func (r *Rclone) start() {
 		for _, file := range files {
 			p := lists.rootDir + file.Name()
 			if file.IsDir() {
-				err = r.unmount(p)
-				if err != nil {
-					logger.queue <- fmt.Sprint(err)
-				}
+				r.unmount(p)
 			}
 			err = os.Remove(p)
 			if err != nil {
@@ -129,30 +126,36 @@ func (r *Rclone) mount(c chan bool) {
 
 			mountDir := lists.rootDir + remote
 			logger.queue <- fmt.Sprintf(`mounting rclone remote %s to %s ...`, remote, mountDir)
-			if err = os.MkdirAll(mountDir, 0755); err != nil {
-				return
+			for {
+				if err = os.MkdirAll(mountDir, 0755); err != nil {
+					return
+				}
+				cmd := exec.Command(
+					r.cmd,
+					`mount`,
+					remote,
+					mountDir,
+					`--read-only`,
+				)
+				r.mounts[mountDir] = cmd
+				cmd.Env = os.Environ()
+				cmd.SysProcAttr = &syscall.SysProcAttr{
+					// Pdeathsig: syscall.SIGKILL,
+					Pdeathsig: syscall.SIGTERM,
+				}
+				if err = cmd.Run(); err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
+				r.unmount(mountDir)
+				if err = os.Remove(mountDir); err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
 			}
-			cmd := exec.Command(
-				r.cmd,
-				`mount`,
-				remote,
-				mountDir,
-				`--read-only`,
-			)
-			cmd.Env = os.Environ()
-			cmd.SysProcAttr = &syscall.SysProcAttr{
-				// Pdeathsig: syscall.SIGKILL,
-				Pdeathsig: syscall.SIGTERM,
-			}
-			if err = cmd.Run(); err != nil {
-				logger.queue <- fmt.Sprint(err)
-			}
-			err = os.Remove(mountDir)
 		}()
 	}
 }
 
-func (r *Rclone) unmount(dir string) error {
+func (r *Rclone) unmount(dir string) bool {
 	var err error
 
 	defer func() {
@@ -161,11 +164,11 @@ func (r *Rclone) unmount(dir string) error {
 		}
 	}()
 
-	err = exec.Command(`fusermount`, `-u`, dir).Run()
+	err = exec.Command(`/bin/sh`, `-c`, fmt.Sprintf("'fusermount -u %s || fusermount -z %s'", dir, dir)).Run()
 	if err == nil {
 		err = os.Remove(dir)
 	}
-	return err
+	return err == nil
 }
 
 func (r *Rclone) getRemotes() (remotes []string) {
@@ -181,7 +184,8 @@ func (r *Rclone) getRemotes() (remotes []string) {
 
 func (r *Rclone) checkRemote(remote string) bool {
 	if err := exec.Command(r.cmd, `size`, remote+`:`).Run(); err != nil {
-		r.unmount(lists.rootDir + remote)
+		mountDir := lists.rootDir + remote
+		r.mounts[mountDir].Process.Kill()
 		return false
 	}
 	return true

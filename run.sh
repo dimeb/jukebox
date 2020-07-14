@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export JUKEBOX_SH_PID=$$
-
 declare -a DRIVES
 export DRIVES
 declare -a MOUNTED

@@ -23,7 +23,7 @@ type Config struct {
 	LogFile string `yaml:"log_file,omitempty"`
 	// LogFileRotateSize log file rotation size in bytes.
 	LogFileRotateSize int `yaml:"log_file_rotate_size,omitempty"`
-	// VLCOptions options for initializing VLC library.
+	// VLCOptions options for initializing vlc player.
 	VLCOptions []string `yaml:"vlc_options,omitempty"`
 	// VolumeStep random and play lists volume increasing/decreasing step.
 	VolumeStep int `yaml:"volume_step,omitempty"`
@@ -100,6 +100,8 @@ var (
 			`--ignore-config`,
 			`--no-video`,
 			`--quiet`,
+			`--file-caching=1000`,
+			`--network-caching=3000`,
 			// `--play-and-exit`,
 			// `--audio-filter`,
 			// `normvol`,
