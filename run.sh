@@ -5,9 +5,14 @@ export DRIVES
 declare -a MOUNTED
 export MOUNTED
 
+function run_command() {
+  (echo -n $(date +"%x %T: ")"$@: " 1>&2 ; $@) 2>>run.err
+  echo -n $?
+}
+
 function exit_handler_mount() {
   for d in ${MOUNTED[@]}; do
-    pumount /mnt/$d
+    run_command pumount /dev/$d
   done
 }
 
@@ -15,11 +20,10 @@ MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
   if [[ -z "${SSH_TTY}" ]]; then
     lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
-      mkdir -p /mnt/$drive
-      pmount /dev/$drive /mnt/$drive
-      if [ $? -eq 0 ]; then
+      status=$(run_command pmount /dev/$drive)
+      if [ $status -eq 0 ]; then
         $MOUNTED+=( $drive )
-        $DRIVES+=( /mnt/$drive )
+        $DRIVES+=( /media/$drive )
       fi
     done
   else
@@ -36,12 +40,6 @@ done
 for i in ${!DRIVES[@]}; do
   mkdir -p Music/${DRIVES[$i]}
   rclone config create Local$i alias remote ${DRIVES[$i]}
-done
-rclone listremotes | cut -d ":" -f 1 | while read remote ; do
-  fusermount -u Music/$remote
-  sleep 0.5
-  rm -rf Music/$remote
-  rclone size $remote && mkdir -p Music/$remote && rclone mount $remote Music/$remote --daemon --read-only
 done
 
 export JUKEBOX=./jukebox
