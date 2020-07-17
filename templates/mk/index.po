@@ -10,6 +10,9 @@ msgstr "Џубокс!"
 msgid "Audio"
 msgstr "Аудио"
 
+msgid "Rclone"
+msgstr "Rclone"
+
 msgid "Lists"
 msgstr "Листи"
 

@@ -10,6 +10,9 @@ msgstr "Jukebox!"
 msgid "Audio"
 msgstr "Audio"
 
+msgid "Rclone"
+msgstr "Rclone"
+
 msgid "Lists"
 msgstr "Lists"
 

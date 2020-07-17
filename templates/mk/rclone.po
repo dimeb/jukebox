@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Rclone config"
+msgstr "Конфигурација на Rclone"
+
+msgid "Rclone note"
+msgstr "Ве молиме не додвајте, не менувајте и не бришете во опциите 'Alias' и 'Local'. Тие се автоматски исконфигурарни во зависност од приклучените дискови."

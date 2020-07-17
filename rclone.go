@@ -38,18 +38,18 @@ func (r *Rclone) start() {
 				`rcd`,
 				`--rc-web-gui`,
 				`--rc-web-gui-no-open-browser`,
-				`--rc-addr="127.0.0.1:11000"`,
+				`--rc-addr=127.0.0.1:11000`,
 			)
 			rcd.Env = os.Environ()
 			rcd.SysProcAttr = &syscall.SysProcAttr{
 				// Pdeathsig: syscall.SIGKILL,
 				Pdeathsig: syscall.SIGTERM,
 			}
-			err := rcd.Start()
+			stderr, err := rcd.StderrPipe()
 			if err != nil {
 				logger.queue <- fmt.Sprint(err)
 			} else {
-				stderr, err := rcd.StderrPipe()
+				err := rcd.Start()
 				if err != nil {
 					logger.queue <- fmt.Sprint(err)
 				} else {
@@ -60,7 +60,7 @@ func (r *Rclone) start() {
 						if strings.Contains(s, `Web GUI is not automatically opening browser.`) {
 							a := strings.Split(s, ` `)
 							if len(a) > 2 {
-								r.rcdURL = a[len(a)-2]
+								r.rcdURL = a[len(a)-3]
 							}
 							b = true
 						} else {
@@ -80,35 +80,37 @@ func (r *Rclone) start() {
 		}
 	}()
 
-	unmounted := make(chan bool)
+	/*
+		unmounted := make(chan bool)
 
-	// Mount remotes.
-	go r.mount(unmounted)
+		// Mount remotes.
+		go r.mount(unmounted)
 
-	// Unmount everything unconditionally.
-	dir, err := os.Open(lists.rootDir)
-	if err != nil {
-		logger.queue <- fmt.Sprint(err)
-	} else {
-		defer dir.Close()
-		files, err := dir.Readdir(-1)
+		// Unmount everything unconditionally.
+		dir, err := os.Open(lists.rootDir)
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
-		}
-		for _, file := range files {
-			p := lists.rootDir + file.Name()
-			if file.IsDir() {
-				r.unmount(p)
-			}
-			err = os.Remove(p)
+		} else {
+			defer dir.Close()
+			files, err := dir.Readdir(-1)
 			if err != nil {
 				logger.queue <- fmt.Sprint(err)
 			}
+			for _, file := range files {
+				p := lists.rootDir + file.Name()
+				if file.IsDir() {
+					r.unmount(p)
+				}
+				err = os.Remove(p)
+				if err != nil {
+					logger.queue <- fmt.Sprint(err)
+				}
+			}
 		}
-	}
-	unmounted <- true
+		unmounted <- true
 
-	r.checkLists()
+		r.checkLists()
+	*/
 }
 
 func (r *Rclone) mount(c chan bool) {

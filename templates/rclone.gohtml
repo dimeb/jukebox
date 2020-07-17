@@ -1,0 +1,29 @@
+{{define "rclone"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Rclone`}}";
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            {{.T.GetD `rclone` `Rclone config`}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            {{.T.GetD `rclone` `Rclone note`}}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <iframe src="{{.Data.RcloneURL}}" style="width:95%;height:auto;"></iframe>
+        </div>
+    </div>
+</div>
+{{end}}
