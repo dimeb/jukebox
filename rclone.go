@@ -61,6 +61,7 @@ func (r *Rclone) start() {
 							a := strings.Split(s, ` `)
 							if len(a) > 2 {
 								r.rcdURL = a[len(a)-3]
+								logger.queue <- fmt.Sprint(r.rcdURL)
 							}
 							b = true
 						} else {

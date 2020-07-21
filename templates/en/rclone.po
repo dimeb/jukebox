@@ -5,7 +5,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Rclone config"
-msgstr "Rclone configuration"
+msgstr "Rclone configuration. You can find documentation here"
 
 msgid "Rclone note"
 msgstr "Please do not add, change or delete in 'Alias' and 'Local' remote types. They are automatically created as needed based on locally attached storage."

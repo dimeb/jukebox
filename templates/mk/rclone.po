@@ -5,7 +5,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Rclone config"
-msgstr "Конфигурација на Rclone"
+msgstr "Конфигурација на Rclone. Документацијата може да ја најдете овде"
 
 msgid "Rclone note"
 msgstr "Ве молиме не додвајте, не менувајте и не бришете во опциите 'Alias' и 'Local'. Тие се автоматски исконфигурарни во зависност од приклучените дискови."

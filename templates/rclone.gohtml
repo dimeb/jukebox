@@ -10,7 +10,7 @@
     </div>
     <div class="row">
         <div class="col c12">
-            {{.T.GetD `rclone` `Rclone config`}}
+            {{.T.GetD `rclone` `Rclone config`}} <a href="https://rclone.org" target="_blank">https://rclone.org</a>.
         </div>
     </div>
     <div class="row">
@@ -22,7 +22,8 @@
 <div class="container">
     <div class="row">
         <div class="col c12">
-            <iframe src="{{.Data.RcloneURL}}" style="width:95%;height:auto;"></iframe>
+            <!-- <iframe src="{{.Data.RcloneURL}}" style="width:95%;height:auto;"></iframe> -->
+            <iframe src="http://127.0.0.1:11000" style="width:95%;height:auto;"></iframe>
         </div>
     </div>
 </div>
