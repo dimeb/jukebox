@@ -431,6 +431,11 @@ func (ui *UserInterface) screenBrowseInit() error {
 		if path == lists.rootDir {
 			return nil
 		}
+		// Rclone mounts.
+		dirList := strings.Split(path, `/`)
+		if len(dirList) == 2 && (dirList[0]+`/`) == lists.rootDir && info.IsDir() {
+			return nil
+		}
 
 		l := len(lists.BrowseList)
 		ok := true
