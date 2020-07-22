@@ -1,6 +1,7 @@
 {{define "rclone"}}
 <script>
     var pageTitle = "{{.T.GetD `index` `Rclone`}}";
+    var rcloneURL = "{{.Data.RcloneURL}}"
 </script>
 <div class="container">
     <div class="row">
@@ -22,9 +23,9 @@
 <div class="container">
     <div class="row">
         <div class="col c12">
-            <!-- <iframe src="{{.Data.RcloneURL}}" style="width:95%;height:auto;"></iframe> -->
-            <iframe src="http://127.0.0.1:11000" style="width:95%;height:auto;"></iframe>
+            <iframe id="rclone-iframe-id" src="" style="width:95%;height:auto;"></iframe>
         </div>
     </div>
 </div>
+<script src="/js/rclone.js?v={{.JSV}}"></script>
 {{end}}
