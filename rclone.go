@@ -138,6 +138,8 @@ func (r *Rclone) mount(c chan bool) {
 					`mount`,
 					remote,
 					mountDir,
+					`--no-checksum`,
+					`--no-modtime`,
 					`--read-only`,
 				)
 				r.mounts[mountDir] = cmd
