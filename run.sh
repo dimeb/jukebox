@@ -45,6 +45,7 @@ for i in ${!DRIVES[@]}; do
   ln -s ${DRIVES[$i]} Music/Music$i >>$RUNLOGFILE 2>&1
   LINKS+=( "Music$i" )
 done
+export JUKEBOX_DRIVES="${DRIVES[@]}"
 
 export JUKEBOX=./jukebox
 export JUKEBOX_ERR_FILE=./jukebox.err
