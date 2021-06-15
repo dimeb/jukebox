@@ -269,8 +269,6 @@ func (wa *WebAdmin) response(w http.ResponseWriter, r *http.Request) {
 		wa.audio(w, r)
 	case `audio_volume`:
 		wa.audioVolume(w, r)
-	case `rclone`:
-		wa.rclone(w, r)
 	case `lists`:
 		wa.lists(w, r)
 	case `lists_search`:
@@ -420,17 +418,6 @@ func (wa *WebAdmin) audioVolume(w http.ResponseWriter, r *http.Request) {
 	}
 	status := http.StatusBadRequest
 	http.Error(w, http.StatusText(status), status)
-}
-
-// Rclone config page.
-func (wa *WebAdmin) rclone(w http.ResponseWriter, r *http.Request) {
-	wa.data = struct {
-		RcloneURL string
-	}{
-		rclone.rcdURL,
-	}
-
-	wa.render(w)
 }
 
 // Lists configuration.
@@ -614,7 +601,7 @@ func (wa *WebAdmin) skin(w http.ResponseWriter, r *http.Request) {
 	)
 
 	// Load skins.
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
 	} else {

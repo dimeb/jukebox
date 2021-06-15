@@ -1,45 +1,49 @@
 #!/bin/bash
 
+RUNLOGFILE=run.log
+
 declare -a DRIVES
 export DRIVES
-declare -a MOUNTED
-export MOUNTED
-
-function run_command() {
-  (echo -n $(date +"%x %T: ")"$@: " 1>&2 ; $@) 2>>run.err
-  echo -n $?
-}
+declare -a MOUNTS
+export MOUNTS
+declare -a LINKS
+export LINKS
 
 function exit_handler_mount() {
-  for d in ${MOUNTED[@]}; do
-    run_command pumount /dev/$d
+  for d in ${MOUNTS[@]}; do
+    pumount /dev/$d >>$RUNLOGFILE 2>&1
+  done
+  for i in ${!LINKS[@]}; do
+    rm Music/Music$i >>$RUNLOGFILE 2>&1
   done
 }
 
-MACHINE=`uname -m`
-if [[ $MACHINE == arm* ]]; then
-  if [[ -z "${SSH_TTY}" ]]; then
-    lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT | grep '^sd[a-z][0-9] part $' | cut -d " " -f 1 | while read drive ; do
-      status=$(run_command pmount /dev/$drive)
-      if [ $status -eq 0 ]; then
-        $MOUNTED+=( $drive )
-        $DRIVES+=( /media/$drive )
-      fi
-    done
-  else
-    exit 0
-  fi
-else
-  if [ -d $HOME/Music ]; then
-    $DRIVES+=( $HOME/Music )
-  fi 
+mkdir -p Music
+
+if [ -d $HOME/Music ] && [ -n "$(ls -A $HOME/Music)" ]; then
+  DRIVES+=( "$HOME/Music" )
 fi
-rclone listremotes | grep ^Local | cut -d ":" -f 1 | while read remote ; do
-  rclone config delete $remote
-done
+
+if [[ -z "${SSH_TTY}" ]]; then
+   while read drive ; do
+    param=( $drive )
+    if [ ${#param[@]} -eq 3 ]; then
+      pmount -r /dev/${param[0]} >>$RUNLOGFILE 2>&1
+      if [ $? -eq 0 ]; then
+        MOUNTS+=( "${param[0]}" )
+        DRIVES+=( "/media/${param[0]}" )
+      fi
+    else
+      DRIVES+=( "${param[2]}" )
+    fi
+  done < <(lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT,HOTPLUG | grep '^sd[a-z][0-9] part .* 1$')
+else
+  exit 0
+fi
+
 for i in ${!DRIVES[@]}; do
-  mkdir -p Music/${DRIVES[$i]}
-  rclone config create Local$i alias remote ${DRIVES[$i]}
+  ln -s ${DRIVES[$i]} Music/Music$i >>$RUNLOGFILE 2>&1
+  LINKS+=( "Music$i" )
 done
 
 export JUKEBOX=./jukebox
@@ -85,6 +89,7 @@ do
   fi
 done
 
+MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
   mkdir -p $HOME/.config/openbox
   AUTOSTART=$HOME/.config/openbox/autostart

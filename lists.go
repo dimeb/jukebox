@@ -222,7 +222,7 @@ func (l Lists) randomList() {
 	if len(l.RandomList) > 0 {
 		lst = append(lst, l.RandomList...)
 	} else {
-		files, _ := ioutil.ReadDir(l.rootDir)
+		files, _ := os.ReadDir(l.rootDir)
 		for _, file := range files {
 			lst = append(lst, file.Name())
 		}
@@ -253,6 +253,7 @@ func (l Lists) randomList() {
 			continue
 		}
 		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			logger.queue <- fmt.Sprintf("%s", path)
 			if err != nil {
 				return filepath.SkipDir
 			}

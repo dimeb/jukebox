@@ -198,9 +198,6 @@ func (j *Jukebox) play() {
 		case isPlaying = <-output:
 			if isPlaying == `0` {
 				if stopPlaying > 0 {
-					if stopPlaying == 1 {
-						rclone.playingStopped <- true
-					}
 					stopPlaying++
 					continue
 				}

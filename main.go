@@ -94,9 +94,6 @@ func main() {
 		internetRadio = NewInternetRadio()
 		defer internetRadio.closeDB()
 
-		// Start rclone.
-		rclone.start()
-
 		// Start web administration.
 		webAdmin = NewWebAdmin()
 		webAdmin.action <- 'S'
