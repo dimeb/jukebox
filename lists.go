@@ -231,6 +231,7 @@ func (l Lists) randomList() {
 	if len(lst) == 0 {
 		return
 	}
+
 	f, err := os.Create(l.randomPlayListFile)
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
