@@ -42,6 +42,8 @@ type Lists struct {
 	labelHeight int
 	// Music root directory.
 	rootDir string
+	// Music real root directory.
+	realRootDir string
 	// Lists file.
 	listsFile string
 	// Number of songs per slot.
@@ -115,8 +117,14 @@ var (
 
 // Load random and play lists from yaml file.
 func (l *Lists) load() error {
+	realRootDir, err := filepath.EvalSymlinks(l.rootDir)
+	if err != nil {
+		return err
+	}
+	l.realRootDir = realRootDir
+
 	toSave := false
-	_, err := os.Stat(l.listsFile)
+	_, err = os.Stat(l.listsFile)
 	if os.IsNotExist(err) {
 		toSave = true
 	} else {
@@ -171,6 +179,7 @@ func (l Lists) copy() Lists {
 		labelWidth:         l.labelWidth,
 		labelHeight:        l.labelHeight,
 		rootDir:            l.rootDir,
+		realRootDir:        l.realRootDir,
 		listsFile:          l.listsFile,
 		playListNumber:     l.playListNumber,
 		artworkDir:         l.artworkDir,
@@ -223,7 +232,7 @@ func (l Lists) randomList() {
 	if len(l.RandomList) > 0 {
 		lst = append(lst, l.RandomList...)
 	} else {
-		files, _ := os.ReadDir(l.rootDir)
+		files, _ := os.ReadDir(l.realRootDir)
 		for _, file := range files {
 			lst = append(lst, file.Name())
 		}
@@ -239,38 +248,29 @@ func (l Lists) randomList() {
 	}
 	defer f.Close()
 	for _, dir := range lst {
-		dir = l.rootDir + dir
-		info, err := os.Stat(dir)
+		realDir := l.realRootDir + dir
+		info, err := os.Stat(realDir)
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
 			continue
 		}
 		if info.Mode().IsRegular() {
 			if l.checkSong(dir) {
-				_, err = f.Write([]byte(dir + "\n"))
+				_, err = f.Write([]byte(l.rootDir + dir + "\n"))
 				if err != nil {
 					logger.queue <- fmt.Sprint(err)
 				}
 			}
 			continue
 		}
-		realDir, err := filepath.EvalSymlinks(dir)
-		if err != nil {
-			logger.queue <- fmt.Sprint(err)
-			continue
-		}
 		err = filepath.Walk(realDir, func(path string, info os.FileInfo, err error) error {
-			logger.queue <- fmt.Sprintf("%s -> %s", path, dir+`/`+info.Name())
+			logger.queue <- fmt.Sprintf("%s", path)
 			if err != nil {
 				return filepath.SkipDir
 			}
-			// file := path
-			file := dir + `/` + info.Name()
-			if info.Mode().IsRegular() {
-				if l.checkSong(file) {
-					if _, e := f.Write([]byte(file + "\n")); e != nil {
-						logger.queue <- fmt.Sprint(e)
-					}
+			if info.Mode().IsRegular() && l.checkSong(path) {
+				if _, e := f.Write([]byte(l.rootDir + strings.TrimPrefix(path, l.realRootDir) + "\n")); e != nil {
+					logger.queue <- fmt.Sprint(e)
 				}
 			}
 			return nil
@@ -454,7 +454,7 @@ func (l *Lists) webAdminData() ([]byte, bool) {
 
 	i := 1
 	dirs := make(map[string]int)
-	err = filepath.Walk(l.rootDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(l.realRootDir, func(path string, info os.FileInfo, err error) error {
 		defer func() {
 			i++
 		}()
@@ -464,29 +464,12 @@ func (l *Lists) webAdminData() ([]byte, bool) {
 			return filepath.SkipDir
 		}
 
-		path = strings.TrimPrefix(path, l.rootDir)
+		path = strings.TrimPrefix(path, l.realRootDir)
 		folder := `0`
 		if info.IsDir() {
 			folder = `1`
 			if _, ok := dirs[path]; !ok {
 				dirs[path] = i
-			}
-		} else if info.Mode()&os.ModeSymlink != 0 {
-			realPath, err := filepath.EvalSymlinks(path)
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return filepath.SkipDir
-			}
-			info, err = os.Stat(realPath)
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return filepath.SkipDir
-			}
-			if info.IsDir() {
-				folder = `1`
-				if _, ok := dirs[path]; !ok {
-					dirs[path] = i
-				}
 			}
 		}
 		if len(path) > 0 {

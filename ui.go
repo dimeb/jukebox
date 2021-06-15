@@ -419,7 +419,7 @@ func (ui *UserInterface) screenBrowseInit() error {
 
 	i := 1
 	dirs := make(map[string]int)
-	err = filepath.Walk(lists.rootDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(lists.realRootDir, func(path string, info os.FileInfo, err error) error {
 		defer func() {
 			i++
 		}()
@@ -428,18 +428,13 @@ func (ui *UserInterface) screenBrowseInit() error {
 			logger.queue <- fmt.Sprint(err)
 			return filepath.SkipDir
 		}
-		if path == lists.rootDir {
-			return nil
-		}
-		// Rclone mounts.
-		dirList := strings.Split(path, `/`)
-		if len(dirList) == 2 && (dirList[0]+`/`) == lists.rootDir && info.IsDir() {
+		if path == lists.realRootDir {
 			return nil
 		}
 
 		l := len(lists.BrowseList)
 		ok := true
-		path = strings.TrimPrefix(path, lists.rootDir)
+		path = strings.TrimPrefix(path, lists.realRootDir)
 		if info.IsDir() && l > 0 {
 			ok = false
 			for _, bl := range lists.BrowseList {

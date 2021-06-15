@@ -1,0 +1,57 @@
+debug: 1
+log_file: jukebox.log
+log_file_rotate_size: 1000000
+vlc_options:
+- -A
+- alsa,none
+- --alsa-audio-device
+- default
+- --no-media-library
+- --no-metadata-network-access
+- --ignore-config
+- --no-video
+- --quiet
+- --file-caching=1000
+- --network-caching=3000
+volume_step: 2
+play_list_volume: 100
+play_list_volume_up:
+- 27
+- 91
+- 67
+play_list_volume_down:
+- 27
+- 91
+- 68
+random_list_volume: 50
+random_list_volume_up:
+- 27
+- 91
+- 65
+random_list_volume_down:
+- 27
+- 91
+- 66
+internet_radio_volume: 50
+internet_radio_volume_up:
+- 27
+- 91
+- 53
+- 126
+internet_radio_volume_down:
+- 27
+- 91
+- 54
+- 126
+internet_radio_download_url: http://backups.radio-browser.info/latest.sql.gz
+background_music: list
+web_admin_username: admin
+web_admin_password: $2a$04$Ta6sfUK8l/WOmBli7hhyT.pgWI1Ac8aFs0vOIuhQza3OGjK57s7JS
+web_admin_http_address:
+- :9090
+web_admin_https_address:
+- :9191
+web_admin_language: en
+tls_cert_file: tls.crt
+tls_key_file: tls.key
+skin: default

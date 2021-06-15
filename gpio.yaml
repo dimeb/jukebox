@@ -1,0 +1,18 @@
+chip_money_type: chip
+chip_money_pin: "11"
+chip_money_pulse_duration: 20
+chip_money_pulse_pause: 100
+chip_money_contact: "no"
+chip_money:
+  chip:
+    "1":
+      pulses: 3
+      songs: 1
+  money:
+    "5":
+      pulses: 3
+      songs: 1
+    "10":
+      pulses: 5
+      songs: 2
+light_led_number: 150

@@ -1,0 +1,990 @@
+random_list:
+- /Rock
+- /Pop
+- /Blues/LittleWalter
+play_list:
+  "0":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "1":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "2":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "3":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "4":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "5":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "6":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "7":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "8":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+  "9":
+    a:
+      file: ""
+      name: ""
+      author: ""
+    b:
+      file: ""
+      name: ""
+      author: ""
+    c:
+      file: ""
+      name: ""
+      author: ""
+    d:
+      file: ""
+      name: ""
+      author: ""
+    e:
+      file: ""
+      name: ""
+      author: ""
+    f:
+      file: ""
+      name: ""
+      author: ""
+    g:
+      file: ""
+      name: ""
+      author: ""
+    h:
+      file: ""
+      name: ""
+      author: ""
+    i:
+      file: ""
+      name: ""
+      author: ""
+    j:
+      file: ""
+      name: ""
+      author: ""
+    k:
+      file: ""
+      name: ""
+      author: ""
+    l:
+      file: ""
+      name: ""
+      author: ""
+    m:
+      file: ""
+      name: ""
+      author: ""
+    "n":
+      file: ""
+      name: ""
+      author: ""
+    o:
+      file: ""
+      name: ""
+      author: ""
+    p:
+      file: ""
+      name: ""
+      author: ""
+    q:
+      file: ""
+      name: ""
+      author: ""
+    r:
+      file: ""
+      name: ""
+      author: ""
+    s:
+      file: ""
+      name: ""
+      author: ""
+    t:
+      file: ""
+      name: ""
+      author: ""
+    u:
+      file: ""
+      name: ""
+      author: ""
+    v:
+      file: ""
+      name: ""
+      author: ""
+    w:
+      file: ""
+      name: ""
+      author: ""
+    x:
+      file: ""
+      name: ""
+      author: ""
+show_play_list:
+  "0": true
+  "1": true
+  "2": true
+  "3": true
+  "4": true
+  "5": false
+  "6": false
+  "7": false
+  "8": false
+  "9": false
+browse_list:
+- Music/VA-FLAC
+- Music/Blues
+label_content: name-left-author-left

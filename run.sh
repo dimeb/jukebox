@@ -14,7 +14,7 @@ function exit_handler_mount() {
 }
 
 rm -rf $JUKEBOX_MOUNT_POINT
-if [[ ! -a $JUKEBOX_MOUNT_POINT ]]; then
+if [[ -a $JUKEBOX_MOUNT_POINT ]]; then
   echo "Cannot remove $JUKEBOX_MOUNT_POINT" >> $RUNLOGFILE
   exit 1
 fi
