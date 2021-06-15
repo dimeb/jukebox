@@ -219,6 +219,7 @@ func (l Lists) checkSong(name string) bool {
 // Generate random song list.
 func (l Lists) randomList() {
 	var lst []string
+
 	if len(l.RandomList) > 0 {
 		lst = append(lst, l.RandomList...)
 	} else {
@@ -252,14 +253,21 @@ func (l Lists) randomList() {
 			}
 			continue
 		}
-		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-			logger.queue <- fmt.Sprintf("%s", path)
+		realDir, err := filepath.EvalSymlinks(dir)
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+			continue
+		}
+		err = filepath.Walk(realDir, func(path string, info os.FileInfo, err error) error {
+			logger.queue <- fmt.Sprintf("%s -> %s", path, dir+`/`+info.Name())
 			if err != nil {
 				return filepath.SkipDir
 			}
+			// file := path
+			file := dir + `/` + info.Name()
 			if info.Mode().IsRegular() {
-				if l.checkSong(path) {
-					if _, e := f.Write([]byte(path + "\n")); e != nil {
+				if l.checkSong(file) {
+					if _, e := f.Write([]byte(file + "\n")); e != nil {
 						logger.queue <- fmt.Sprint(e)
 					}
 				}
