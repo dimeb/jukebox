@@ -72,8 +72,6 @@ func (ir *InternetRadio) checkTables(dbh *sqlite3.Conn) error {
 			`language TEXT,` +
 			`tags TEXT,` +
 			`votes NTEGER NOT NULL,` +
-			`negative_votes INTEGER NOT NULL,` +
-			`source TEXT,` +
 			`subcountry TEXT,` +
 			`click_count INTEGER NOT NULL,` +
 			`click_trend INTEGER NOT NULL,` +
@@ -85,10 +83,15 @@ func (ir *InternetRadio) checkTables(dbh *sqlite3.Conn) error {
 			`url_cache TEXT NOT NULL,` +
 			`last_check_ok_time DATETIME,` +
 			`hls INTEGER NOT NULL,` +
-			`ip TEXT NOT NULL,` +
 			`change_uuid TEXT UNIQUE,` +
 			`station_uuid TEXT UNIQUE,` +
-			`country_code TEXT);` +
+			`country_code TEXT,` +
+			`last_local_check_time DATETIME,` +
+			`country_subdivision_code TEXT,` +
+			`geo_lat DOUBLE,` +
+			`geo_long DOUBLE,` +
+			`ssl_error INTEGER NOT NULL,` +
+			`language_codes TEXT);` +
 			`CREATE INDEX IF NOT EXISTS station_name ON station (name);` +
 			`CREATE INDEX IF NOT EXISTS station_country ON station (country);` +
 			`CREATE INDEX IF NOT EXISTS station_tags ON station (tags);` +
