@@ -85,8 +85,6 @@ func main() {
 		logger.fatalQueue <- fmt.Sprint(err)
 	}
 
-	logger.queue <- fmt.Sprintf("%+v", os.Environ())
-
 	// If there is a flagFile, play it and exit.
 	// Else start the jukebox.
 	if flagFile != `` {

@@ -471,6 +471,23 @@ func (l *Lists) webAdminData() ([]byte, bool) {
 			if _, ok := dirs[path]; !ok {
 				dirs[path] = i
 			}
+		} else if info.Mode()&os.ModeSymlink != 0 {
+			realPath, err := filepath.EvalSymlinks(path)
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return filepath.SkipDir
+			}
+			info, err = os.Stat(realPath)
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return filepath.SkipDir
+			}
+			if info.IsDir() {
+				folder = `1`
+				if _, ok := dirs[path]; !ok {
+					dirs[path] = i
+				}
+			}
 		}
 		if len(path) > 0 {
 			dir := filepath.Dir(path)

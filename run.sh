@@ -2,50 +2,52 @@
 
 RUNLOGFILE=run.log
 
-declare -a DRIVES
-export DRIVES
-declare -a MOUNTS
-export MOUNTS
-declare -a LINKS
-export LINKS
+JUKEBOX_DRIVE=""
+JUKEBOX_MOUNT=""
+JUKEBOX_MOUNT_POINT="Music"
 
 function exit_handler_mount() {
-  for d in ${MOUNTS[@]}; do
-    pumount /dev/$d >>$RUNLOGFILE 2>&1
-  done
-  for i in ${!LINKS[@]}; do
-    rm Music/Music$i >>$RUNLOGFILE 2>&1
-  done
+  if [[ -n "$JUKEBOX_MOUNT" ]]; then
+    pumount /dev/$JUKEBOX_MOUNT >>$RUNLOGFILE 2>&1
+  fi
+  rm $JUKEBOX_MOUNT_POINT >>$RUNLOGFILE 2>&1
 }
 
-mkdir -p Music
-
-if [ -d $HOME/Music ] && [ -n "$(ls -A $HOME/Music)" ]; then
-  DRIVES+=( "$HOME/Music" )
+rm -rf $JUKEBOX_MOUNT_POINT
+if [[ ! -a $JUKEBOX_MOUNT_POINT ]]; then
+  echo "Cannot remove $JUKEBOX_MOUNT_POINT" >> $RUNLOGFILE
+  exit 1
 fi
 
+MACHINE=`uname -m`
+
 if [[ -z "${SSH_TTY}" ]]; then
-   while read drive ; do
-    param=( $drive )
+  if [[ $MACHINE == arm* ]]; then
+    param=`lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT,HOTPLUG | grep '^sd[a-z][0-9] part .* 1$' | head -n 1`
     if [ ${#param[@]} -eq 3 ]; then
       pmount -r /dev/${param[0]} >>$RUNLOGFILE 2>&1
       if [ $? -eq 0 ]; then
-        MOUNTS+=( "${param[0]}" )
-        DRIVES+=( "/media/${param[0]}" )
+        JUKEBOX_MOUNT="${param[0]}"
+        JUKEBOX_DRIVE="/media/${param[0]}"
       fi
     else
-      DRIVES+=( "${param[2]}" )
+      JUKEBOX_DRIVE="${param[2]}"
     fi
-  done < <(lsblk --noheadings --raw -o NAME,TYPE,MOUNTPOINT,HOTPLUG | grep '^sd[a-z][0-9] part .* 1$')
+  else
+    if [ -d $HOME/Music ] && [ -n "$(ls -A $HOME/Music)" ]; then
+      JUKEBOX_DRIVE="$HOME/Music"
+    fi
+  fi
 else
   exit 0
 fi
 
-for i in ${!DRIVES[@]}; do
-  ln -s ${DRIVES[$i]} Music/Music$i >>$RUNLOGFILE 2>&1
-  LINKS+=( "Music$i" )
-done
-export JUKEBOX_DRIVES="${DRIVES[@]}"
+if [[ -n "$JUKEBOX_DRIVE" ]]; then
+  ln -s $JUKEBOX_DRIVE $JUKEBOX_MOUNT_POINT >>$RUNLOGFILE 2>&1
+else
+  echo "Cannot find music drive" >> $RUNLOGFILE
+  exit 2
+fi
 
 export JUKEBOX=./jukebox
 export JUKEBOX_ERR_FILE=./jukebox.err
@@ -90,7 +92,6 @@ do
   fi
 done
 
-MACHINE=`uname -m`
 if [[ $MACHINE == arm* ]]; then
   mkdir -p $HOME/.config/openbox
   AUTOSTART=$HOME/.config/openbox/autostart
