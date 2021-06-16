@@ -316,7 +316,7 @@ func (ui *UserInterface) screen(w http.ResponseWriter, r *http.Request) {
 		} else if ui.ScreenMessageType == `browse_play` {
 			// Play selected songs from broswer screen.
 			for _, song := range strings.Split(ui.ScreenMessageData, `,`) {
-				fileName := lists.rootDir + song
+				fileName := lists.localDir + song
 				if song != `` && lists.checkSong(fileName) {
 					if cfg.Debug != 0 {
 						logger.queue <- fmt.Sprintf("jukebox screen selected from screen browser \"%s\"", fileName)
@@ -419,7 +419,7 @@ func (ui *UserInterface) screenBrowseInit() error {
 
 	i := 1
 	dirs := make(map[string]int)
-	err = filepath.Walk(lists.realRootDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(lists.realLocalDir, func(path string, info os.FileInfo, err error) error {
 		defer func() {
 			i++
 		}()
@@ -428,13 +428,13 @@ func (ui *UserInterface) screenBrowseInit() error {
 			logger.queue <- fmt.Sprint(err)
 			return filepath.SkipDir
 		}
-		if path == lists.realRootDir {
+		if path == lists.realLocalDir {
 			return nil
 		}
 
 		l := len(lists.BrowseList)
 		ok := true
-		path = strings.TrimPrefix(path, lists.realRootDir)
+		path = strings.TrimPrefix(path, lists.realLocalDir)
 		if info.IsDir() && l > 0 {
 			ok = false
 			for _, bl := range lists.BrowseList {

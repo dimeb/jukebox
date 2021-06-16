@@ -40,10 +40,12 @@ type Lists struct {
 	labelWidth int
 	// Label height.
 	labelHeight int
-	// Music root directory.
-	rootDir string
-	// Music real root directory.
-	realRootDir string
+	// Music sources root directory.
+	musicDir string
+	// Linked local drive directory.
+	localDir string
+	// Real local drive directory.
+	realLocalDir string
 	// Lists file.
 	listsFile string
 	// Number of songs per slot.
@@ -80,7 +82,6 @@ var (
 		LabelContent: `name-left-author-left`,
 		labelWidth:   78,
 		labelHeight:  26,
-		rootDir:      `Music/`,
 		listsFile:    `lists.yaml`,
 		playListSongsPerSlot: [24]string{
 			`a`, `b`, `c`, `d`, `e`, `f`,
@@ -117,14 +118,12 @@ var (
 
 // Load random and play lists from yaml file.
 func (l *Lists) load() error {
-	realRootDir, err := filepath.EvalSymlinks(l.rootDir)
-	if err != nil {
-		return err
-	}
-	l.realRootDir = realRootDir
+	l.musicDir = os.Getenv(`JUKEBOX_MUSIC_DIR`) + `/`
+	l.localDir = os.Getenv(`JUKEBOX_MOUNT_POINT`) + `/`
+	l.realLocalDir = os.Getenv(`JUKEBOX_LOCAL_DRIVE`) + `/`
 
 	toSave := false
-	_, err = os.Stat(l.listsFile)
+	_, err := os.Stat(l.listsFile)
 	if os.IsNotExist(err) {
 		toSave = true
 	} else {
@@ -178,8 +177,8 @@ func (l Lists) copy() Lists {
 		LabelContent:       l.LabelContent,
 		labelWidth:         l.labelWidth,
 		labelHeight:        l.labelHeight,
-		rootDir:            l.rootDir,
-		realRootDir:        l.realRootDir,
+		localDir:           l.localDir,
+		realLocalDir:       l.realLocalDir,
 		listsFile:          l.listsFile,
 		playListNumber:     l.playListNumber,
 		artworkDir:         l.artworkDir,
@@ -232,7 +231,7 @@ func (l Lists) randomList() {
 	if len(l.RandomList) > 0 {
 		lst = append(lst, l.RandomList...)
 	} else {
-		files, _ := os.ReadDir(l.realRootDir)
+		files, _ := os.ReadDir(l.realLocalDir)
 		for _, file := range files {
 			lst = append(lst, file.Name())
 		}
@@ -248,7 +247,7 @@ func (l Lists) randomList() {
 	}
 	defer f.Close()
 	for _, dir := range lst {
-		realDir := l.realRootDir + dir
+		realDir := l.realLocalDir + dir
 		info, err := os.Stat(realDir)
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
@@ -256,7 +255,7 @@ func (l Lists) randomList() {
 		}
 		if info.Mode().IsRegular() {
 			if l.checkSong(dir) {
-				_, err = f.Write([]byte(l.rootDir + dir + "\n"))
+				_, err = f.Write([]byte(l.localDir + dir + "\n"))
 				if err != nil {
 					logger.queue <- fmt.Sprint(err)
 				}
@@ -264,12 +263,11 @@ func (l Lists) randomList() {
 			continue
 		}
 		err = filepath.Walk(realDir, func(path string, info os.FileInfo, err error) error {
-			logger.queue <- fmt.Sprintf("%s", path)
 			if err != nil {
 				return filepath.SkipDir
 			}
 			if info.Mode().IsRegular() && l.checkSong(path) {
-				if _, e := f.Write([]byte(l.rootDir + strings.TrimPrefix(path, l.realRootDir) + "\n")); e != nil {
+				if _, e := f.Write([]byte(l.localDir + strings.TrimPrefix(path, l.realLocalDir) + "\n")); e != nil {
 					logger.queue <- fmt.Sprint(e)
 				}
 			}
@@ -318,7 +316,7 @@ func (l *Lists) chosenSongOrList(keyCode []byte, playListNumber ...string) (stri
 		s, ok = lst[string(keyCode)]
 	}
 	if ok {
-		fileName := l.rootDir + s.File
+		fileName := l.localDir + s.File
 		if s.File != `` && l.checkSong(fileName) {
 			return fileName, false, nil
 		}
@@ -454,7 +452,7 @@ func (l *Lists) webAdminData() ([]byte, bool) {
 
 	i := 1
 	dirs := make(map[string]int)
-	err = filepath.Walk(l.realRootDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(l.realLocalDir, func(path string, info os.FileInfo, err error) error {
 		defer func() {
 			i++
 		}()
@@ -464,7 +462,7 @@ func (l *Lists) webAdminData() ([]byte, bool) {
 			return filepath.SkipDir
 		}
 
-		path = strings.TrimPrefix(path, l.realRootDir)
+		path = strings.TrimPrefix(path, l.realLocalDir)
 		folder := `0`
 		if info.IsDir() {
 			folder = `1`
@@ -558,7 +556,7 @@ func (l *Lists) artwork(slot, key string, song *Song) (changed bool) {
 		return
 	}
 
-	file, err := os.Open(l.rootDir + song.File)
+	file, err := os.Open(l.localDir + song.File)
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)
 		return

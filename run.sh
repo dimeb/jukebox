@@ -2,9 +2,10 @@
 
 RUNLOGFILE=run.log
 
-JUKEBOX_DRIVE=""
 JUKEBOX_MOUNT=""
-JUKEBOX_MOUNT_POINT="Music"
+export JUKEBOX_LOCAL_DRIVE=""
+export JUKEBOX_MUSIC_DIR="Music"
+export JUKEBOX_MOUNT_POINT="$JUKEBOX_MUSIC_DIR/Local"
 
 function exit_handler_mount() {
   if [[ -n "$JUKEBOX_MOUNT" ]]; then
@@ -12,6 +13,8 @@ function exit_handler_mount() {
   fi
   rm $JUKEBOX_MOUNT_POINT >>$RUNLOGFILE 2>&1
 }
+
+mkdir -p $JUKEBOX_MUSIC_DIR
 
 rm -rf $JUKEBOX_MOUNT_POINT
 if [[ -a $JUKEBOX_MOUNT_POINT ]]; then
@@ -28,24 +31,24 @@ if [[ -z "${SSH_TTY}" ]]; then
       pmount -r /dev/${param[0]} >>$RUNLOGFILE 2>&1
       if [ $? -eq 0 ]; then
         JUKEBOX_MOUNT="${param[0]}"
-        JUKEBOX_DRIVE="/media/${param[0]}"
+        JUKEBOX_LOCAL_DRIVE="/media/${param[0]}"
       fi
     else
-      JUKEBOX_DRIVE="${param[2]}"
+      JUKEBOX_LOCAL_DRIVE="${param[2]}"
     fi
   else
     if [ -d $HOME/Music ] && [ -n "$(ls -A $HOME/Music)" ]; then
-      JUKEBOX_DRIVE="$HOME/Music"
+      JUKEBOX_LOCAL_DRIVE="$HOME/Music"
     fi
   fi
 else
   exit 0
 fi
 
-if [[ -n "$JUKEBOX_DRIVE" ]]; then
-  ln -s $JUKEBOX_DRIVE $JUKEBOX_MOUNT_POINT >>$RUNLOGFILE 2>&1
+if [[ -n "$JUKEBOX_LOCAL_DRIVE" ]]; then
+  ln -s $JUKEBOX_LOCAL_DRIVE $JUKEBOX_MOUNT_POINT >>$RUNLOGFILE 2>&1
 else
-  echo "Cannot find music drive" >> $RUNLOGFILE
+  echo "Cannot find local music drive" >> $RUNLOGFILE
   exit 2
 fi
 
