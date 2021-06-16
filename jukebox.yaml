@@ -13,6 +13,10 @@ vlc_options:
 - --quiet
 - --file-caching=1000
 - --network-caching=3000
+- --file-logging
+- --logfile=./vlc.log
+- --logmode=text
+- --log-verbose=-1
 volume_step: 2
 play_list_volume: 100
 play_list_volume_up:
@@ -51,7 +55,7 @@ web_admin_http_address:
 - :9090
 web_admin_https_address:
 - :9191
-web_admin_language: en
+web_admin_language: mk
 tls_cert_file: tls.crt
 tls_key_file: tls.key
 skin: default

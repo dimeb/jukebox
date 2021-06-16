@@ -1,13 +1,14 @@
 random_list:
-- /Rock
-- /Pop
-- /Blues/LittleWalter
+- Rock
+- Pop
+- Reggae/BobMarley
+- Blues/LittleWalter
 play_list:
   "0":
     a:
-      file: ""
-      name: ""
-      author: ""
+      file: VA-FLAC/Eagles - Hotel California.flac
+      name: Hotel California
+      author: Eagles
     b:
       file: ""
       name: ""
@@ -29,9 +30,9 @@ play_list:
       name: ""
       author: ""
     g:
-      file: ""
-      name: ""
-      author: ""
+      file: VA-FLAC/Funkadelic - Maggot Brain.flac
+      name: Maggot Brain
+      author: Funkadelic
     h:
       file: ""
       name: ""
@@ -53,9 +54,10 @@ play_list:
       name: ""
       author: ""
     m:
-      file: ""
-      name: ""
-      author: ""
+      file: VA-FLAC/ACDC - You Shook Me All Night Long.flac
+      name: You Shook Me All Night Long
+      author: ACDC
+      icon: jpg
     "n":
       file: ""
       name: ""
@@ -985,6 +987,7 @@ show_play_list:
   "8": false
   "9": false
 browse_list:
-- Music/VA-FLAC
-- Music/Blues
+- VA-FLAC
+- Blues
+- World Music/VA-FLAC
 label_content: name-left-author-left
