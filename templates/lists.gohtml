@@ -89,6 +89,7 @@
     </div>
 <fieldset class="collapsible">
     <legend><span>+</span><span>{{.T.GetD `lists` `Label format`}}</span></legend>
+    <div class="row">{{.T.GetD `lists` `Left side`}}</div>
     <div class="row">
 {{range $i, $option := .Data.LabelContentOptions -}}
 {{if or (eq $i 3) (eq $i 6) (eq $i 9) (eq $i 12) (eq $i 15) -}}
@@ -96,8 +97,21 @@
     <div class="row" style="margin-top:0;">
 {{- end}}
         <div class="col c4">
-            <input type="radio" id="label-content-input-{{$option}}" name="label_content" value="{{$option}}" {{if eq $.Data.Lists.LabelContent $option}}checked{{end}} />
-            <label for="label-content-input-{{$option}}" class="label-content-label" data-format="{{$option}}">{{if lt $i 9}}{{HTMLString ($.T.GetD `lists` `Name author`)}}{{else}}{{HTMLString ($.T.GetD `lists` `Author name`)}}{{end}}</label>
+            <input type="radio" id="label-content-left-side-input-{{$option}}" name="label_content_left_side" value="{{$option}}" {{if eq $.Data.Lists.LabelContentLeftSide $option}}checked{{end}} />
+            <label for="label-content-left-side-input-{{$option}}" class="label-content-label" data-format="{{$option}}">{{if lt $i 9}}{{HTMLString ($.T.GetD `lists` `Name author`)}}{{else}}{{HTMLString ($.T.GetD `lists` `Author name`)}}{{end}}</label>
+        </div>
+{{- end}}
+    </div>
+    <div class="row">{{.T.GetD `lists` `Right side`}}</div>
+    <div class="row">
+{{range $i, $option := .Data.LabelContentOptions -}}
+{{if or (eq $i 3) (eq $i 6) (eq $i 9) (eq $i 12) (eq $i 15) -}}
+    </div>
+    <div class="row" style="margin-top:0;">
+{{- end}}
+        <div class="col c4">
+            <input type="radio" id="label-content-right-side-input-{{$option}}" name="label_content_right_side" value="{{$option}}" {{if eq $.Data.Lists.LabelContentRightSide $option}}checked{{end}} />
+            <label for="label-content-right-side-input-{{$option}}" class="label-content-label" data-format="{{$option}}">{{if lt $i 9}}{{HTMLString ($.T.GetD `lists` `Name author`)}}{{else}}{{HTMLString ($.T.GetD `lists` `Author name`)}}{{end}}</label>
         </div>
 {{- end}}
     </div>

@@ -43,6 +43,12 @@ msgstr "Delete song"
 msgid "Label format"
 msgstr "Label format"
 
+msgid "Left side"
+msgstr "Left side"
+
+msgid "Right side"
+msgstr "Right side"
+
 msgid "Name author"
 msgstr "<span>Song name</span><br><span>Song author</span>"
 

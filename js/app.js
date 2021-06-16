@@ -3,7 +3,7 @@ if (document.readyState !== 'loading') {
 } else if (document.addEventListener) {
     document.addEventListener('DOMContentLoaded', appInit);
 } else {
-    document.attachEvent('onreadystatechange', function() {
+    document.attachEvent('onreadystatechange', function () {
         if (document.readyState === 'complete') appInit();
     });
 }
@@ -20,19 +20,19 @@ var moveYStart = 0;
 
 var webSocket = {
     conn: null,
-    open: function() {
+    open: function () {
         if (this.conn instanceof WebSocket && this.conn.readyState == 1 /* OPEN */) {
             return;
         }
         this.conn = new WebSocket('ws://' + document.location.host + '/data');
         console.log('Web socket opened');
     },
-    send: function(message) {
+    send: function (message) {
         if (this.conn instanceof WebSocket && this.conn.readyState == 1 /* OPEN */) {
             this.conn.send(JSON.stringify(message));
         }
     },
-    close: function(reloadPage = false) {
+    close: function (reloadPage = false) {
         this.conn.close();
     }
 }
@@ -59,7 +59,7 @@ function setUsage() {
         }
     }
     if (img && src !== '') {
-        img.src = '/img/'+skin+'/icon_'+src+'.svg';
+        img.src = '/img/' + skin + '/icon_' + src + '.svg';
     }
     skinSetUsage();
 }
@@ -68,7 +68,7 @@ function coinAlert() {
     const elem = document.getElementById('label-selected-selection');
     elem.style.color = 'red';
     elem.innerHTML = document.getElementById('label-usage-text').innerHTML;
-    setTimeout(function() {
+    setTimeout(function () {
         elem.style.color = document.body.style.color;
         elem.innerHTML = '';
     }, 2000, elem);
@@ -82,24 +82,45 @@ function headerInit() {
 }
 
 function bodyInit() {
-    if (typeof(browseContainer) === 'undefined') {
+    if (typeof (browseContainer) === 'undefined') {
         let top = 'name';
         let topAlign = 'left';
         let bottomAlign = 'left';
-        const arr = screenData.LabelContent.split('-');
+        let topLeft = 'name';
+        let topLeftAlign = 'left';
+        let bottomLeftAlign = 'left';
+        let topRight = 'name';
+        let topRightAlign = 'right';
+        let bottomRightAlign = 'right';
+        let arr = screenData.LabelContentLeftSide.split('-');
         if (arr.length == 4) {
-            top = arr[0];
-            topAlign = arr[1];
-            bottomAlign = arr[3];
+            topLeft = arr[0];
+            topLeftAlign = arr[1];
+            bottomLeftAlign = arr[3];
+        }
+        arr = screenData.LabelContentRightSide.split('-');
+        if (arr.length == 4) {
+            topRight = arr[0];
+            topRightAlign = arr[1];
+            bottomRightAlign = arr[3];
         }
         if (screenData.PlayLists.length > 0) {
             if (playListNumber == '' || !screenData.PlayLists.includes(playListNumber)) {
                 playListNumber = screenData.PlayLists[0];
             }
             for (var i = 0; i < buttonCodes.length; i++) {
+                if (i < 12) {
+                    top = topLeft;
+                    topAlign = topLeftAlign;
+                    bottomAlign = bottomLeftAlign;
+                } else {
+                    top = topRight;
+                    topAlign = topRightAlign;
+                    bottomAlign = bottomRightAlign;
+                }
                 const chr = buttonCodes.substring(i, i + 1);
-                const divTop = document.getElementById('label-top-'+chr);
-                const divBottom = document.getElementById('label-bottom-'+chr);
+                const divTop = document.getElementById('label-top-' + chr);
+                const divBottom = document.getElementById('label-bottom-' + chr);
                 divTop.style.textAlign = topAlign;
                 divBottom.style.textAlign = bottomAlign;
                 divTop.innerHTML = '';
@@ -126,7 +147,7 @@ function bodyInit() {
 }
 
 function footerInit() {
-    if (typeof(browseContainer) !== 'undefined') {
+    if (typeof (browseContainer) !== 'undefined') {
         return;
     }
     if (screenData.PlayLists.length < 2) {
@@ -139,35 +160,35 @@ function footerInit() {
     obj.innerHTML = screenData.ListText;
     objw.appendChild(obj);
     obj = document.createElement('img');
-    obj.src = '/img/'+skin+'/hand_pointing_right.svg';
+    obj.src = '/img/' + skin + '/hand_pointing_right.svg';
     objw.appendChild(obj);
     table.appendChild(objw);
     objw = document.createElement('div');
     obj = document.createElement('img');
     obj.id = 'button-play-list-left';
-    obj.src = '/img/'+skin+'/button_left.svg';
-    obj.onclick = function(){ playListChange(false); };
+    obj.src = '/img/' + skin + '/button_left.svg';
+    obj.onclick = function () { playListChange(false); };
     objw.appendChild(obj);
     table.appendChild(objw);
     for (var i = 0; i < screenData.PlayLists.length; i++) {
         const playList = screenData.PlayLists[i];
         objw = document.createElement('div');
         obj = document.createElement('img');
-        obj.id = 'button-list-'+i;
-        obj.src = '/img/'+skin+'/list'+(playListNumber == playList ? '_selected' : '')+'.svg';
+        obj.id = 'button-list-' + i;
+        obj.src = '/img/' + skin + '/list' + (playListNumber == playList ? '_selected' : '') + '.svg';
         objw.appendChild(obj);
         table.appendChild(objw);
     }
     objw = document.createElement('div');
     obj = document.createElement('img');
     obj.id = 'button-play-list-right';
-    obj.src = '/img/'+skin+'/button_right.svg';
-    obj.onclick = function(){ playListChange(true); };
+    obj.src = '/img/' + skin + '/button_right.svg';
+    obj.onclick = function () { playListChange(true); };
     objw.appendChild(obj);
     table.appendChild(objw);
     objw = document.createElement('div');
     obj = document.createElement('img');
-    obj.src = '/img/'+skin+'/hand_pointing_left.svg';
+    obj.src = '/img/' + skin + '/hand_pointing_left.svg';
     objw.appendChild(obj);
     obj = document.createElement('div');
     obj.innerHTML = screenData.ListText;
@@ -199,7 +220,7 @@ function screenInit() {
     headerInit()
     bodyInit();
     footerInit();
-    document.querySelectorAll('img').forEach(function(img) {
+    document.querySelectorAll('img').forEach(function (img) {
         img.setAttribute('draggable', 'false');
     });
 }
@@ -230,28 +251,28 @@ function songSelection(chr) {
 
 function appReload() {
     const xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', function() {
+    xhr.addEventListener('load', function () {
         window.location.reload(true);
     });
-    xhr.addEventListener('error', function() {
+    xhr.addEventListener('error', function () {
         const elem = document.getElementById('label-selected-selection');
         elem.style.color = 'red';
         elem.innerHTML = screenData.ErrorText;
-        setTimeout(function() {
+        setTimeout(function () {
             elem.style.color = document.body.style.color;
             elem.innerHTML = '';
         }, 500, elem);
     });
     xhr.open('GET', window.location.href);
-    xhr.setRequestHeader('Pragma','no-cache');
-    xhr.setRequestHeader('Expired','-1');
-    xhr.setRequestHeader('Cache-Control','no-cache');
+    xhr.setRequestHeader('Pragma', 'no-cache');
+    xhr.setRequestHeader('Expired', '-1');
+    xhr.setRequestHeader('Cache-Control', 'no-cache');
     xhr.send();
 }
 
 function appInit() {
     skinInit();
-    if (typeof(browseContainer) === 'undefined') {
+    if (typeof (browseContainer) === 'undefined') {
         document.body.addEventListener('mousedown', function (event) {
             isMoving = true;
             moveXStart = event.pageX;
@@ -280,9 +301,9 @@ function appInit() {
     //     document.body.style.cursor = window.innerHeight == window.screen.height ? 'none' : 'default';
     //     bodyInit();
     // });
-    document.getElementById('button-cancel-text').addEventListener('click', function(event) {
+    document.getElementById('button-cancel-text').addEventListener('click', function (event) {
         if (canSelect > 0) {
-            webSocket.send({messageType: 'coin'});
+            webSocket.send({ messageType: 'coin' });
             canSelect = 0;
             playData = [];
             document.getElementById('label-selected-selection').innerHTML = '';
@@ -291,10 +312,10 @@ function appInit() {
             coinAlert();
         }
     });
-    document.getElementById('button-play-text').addEventListener('click', function(event) {
+    document.getElementById('button-play-text').addEventListener('click', function (event) {
         if (canSelect > 0) {
             let msgType = 'play';
-            if (typeof(browseContainer) !== 'undefined') {
+            if (typeof (browseContainer) !== 'undefined') {
                 msgType = 'browse_play';
             }
             webSocket.send({
@@ -310,23 +331,23 @@ function appInit() {
         }
     });
     webSocket.open();
-    webSocket.conn.onclose = function(event) {
+    webSocket.conn.onclose = function (event) {
         console.log('Web socket closed');
-        setInterval(function() {
+        setInterval(function () {
             appReload();
             //webSocket.open();
         }, 1000);
     };
-    webSocket.conn.onerror = function(event) {
+    webSocket.conn.onerror = function (event) {
         console.log('Web socket error: ' + event.message);
     };
-    webSocket.conn.onmessage = function(event) {
+    webSocket.conn.onmessage = function (event) {
         try {
             let data = JSON.parse(event.data);
             let addText = 0;
             switch (data.messageType) {
                 case 'browseInit':
-                    if (typeof(treeViewData) !== 'undefined') {
+                    if (typeof (treeViewData) !== 'undefined') {
                         try {
                             treeViewData = JSON.parse(data.messageData);
                             bodyInit();
@@ -344,7 +365,7 @@ function appInit() {
                         if (canSelect > 1) {
                             addText = canSelect;
                         }
-                        if (typeof(browseContainer) !== 'undefined') {
+                        if (typeof (browseContainer) !== 'undefined') {
                             webSocket.send({
                                 messageType: 'browseInit',
                                 messageData: ''
@@ -374,7 +395,7 @@ function appInit() {
                     }
             }
             if (addText > 0) {
-                document.getElementById('label-selected-text').innerHTML += '<br><span style="font-size:smaller;">('+addText+' '+screenData.SongsText+')</span>';
+                document.getElementById('label-selected-text').innerHTML += '<br><span style="font-size:smaller;">(' + addText + ' ' + screenData.SongsText + ')</span>';
             }
         } catch (e) {
             console.log('Receive error: ' + e.message);

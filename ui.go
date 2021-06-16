@@ -340,36 +340,39 @@ func (ui *UserInterface) screen(w http.ResponseWriter, r *http.Request) {
 
 func (ui *UserInterface) screenInit() error {
 	type songs struct {
-		Songs               map[string]map[string]map[string]string
-		PlayLists           []string
-		SelectionSource     string
-		LabelContent        string
-		ErrorText           string
-		ListText            string
-		UsageText           string
-		UsageSongText       string
-		UsageIconText       string
-		SongSelectedText    string
-		SongsText           string
-		CancelSelectionText string
-		PlaySelectionText   string
-		ChipText            string
-		MoneyText           string
+		Songs                 map[string]map[string]map[string]string
+		PlayLists             []string
+		SelectionSource       string
+		LabelContent          string
+		LabelContentLeftSide  string
+		LabelContentRightSide string
+		ErrorText             string
+		ListText              string
+		UsageText             string
+		UsageSongText         string
+		UsageIconText         string
+		SongSelectedText      string
+		SongsText             string
+		CancelSelectionText   string
+		PlaySelectionText     string
+		ChipText              string
+		MoneyText             string
 	}
 
 	pl := songs{
-		LabelContent:        lists.LabelContent,
-		ErrorText:           locale.GetD(`ui`, `Error`),
-		ListText:            locale.GetD(`ui`, `Change list`),
-		UsageText:           locale.GetD(`ui`, `Usage`),
-		UsageSongText:       locale.GetD(`ui`, `Usage song`),
-		UsageIconText:       locale.GetD(`ui`, `Usage icon`),
-		SongSelectedText:    locale.GetD(`ui`, `Song selected`),
-		SongsText:           locale.GetD(`ui`, `Songs`),
-		CancelSelectionText: locale.GetD(`ui`, `Cancel`),
-		PlaySelectionText:   locale.GetD(`ui`, `Play`),
-		ChipText:            locale.GetD(`ui`, `Chip`),
-		MoneyText:           locale.GetD(`ui`, `Money`),
+		LabelContentLeftSide:  lists.LabelContentLeftSide,
+		LabelContentRightSide: lists.LabelContentRightSide,
+		ErrorText:             locale.GetD(`ui`, `Error`),
+		ListText:              locale.GetD(`ui`, `Change list`),
+		UsageText:             locale.GetD(`ui`, `Usage`),
+		UsageSongText:         locale.GetD(`ui`, `Usage song`),
+		UsageIconText:         locale.GetD(`ui`, `Usage icon`),
+		SongSelectedText:      locale.GetD(`ui`, `Song selected`),
+		SongsText:             locale.GetD(`ui`, `Songs`),
+		CancelSelectionText:   locale.GetD(`ui`, `Cancel`),
+		PlaySelectionText:     locale.GetD(`ui`, `Play`),
+		ChipText:              locale.GetD(`ui`, `Chip`),
+		MoneyText:             locale.GetD(`ui`, `Money`),
 	}
 	// Selection source
 	if cfg.FreeSongsSelection == 1 {

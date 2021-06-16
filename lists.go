@@ -34,8 +34,10 @@ type Lists struct {
 	ShowPlayList map[string]bool `yaml:"show_play_list"`
 	// BrowseList folder list for browse skin.
 	BrowseList []string `yaml:"browse_list,omitempty"`
-	// Position of song name and author in label.
-	LabelContent string `yaml:"label_content"`
+	// Position of song name and author in left side label.
+	LabelContentLeftSide string `yaml:"label_content_left_side"`
+	// Position of song name and author in right side label.
+	LabelContentRightSide string `yaml:"label_content_right_side"`
 	// Label width.
 	labelWidth int
 	// Label height.
@@ -78,11 +80,12 @@ var (
 			`8`: false,
 			`9`: false,
 		},
-		BrowseList:   []string{},
-		LabelContent: `name-left-author-left`,
-		labelWidth:   78,
-		labelHeight:  26,
-		listsFile:    `lists.yaml`,
+		BrowseList:            []string{},
+		LabelContentLeftSide:  `name-left-author-left`,
+		LabelContentRightSide: `name-right-author-right`,
+		labelWidth:            78,
+		labelHeight:           26,
+		listsFile:             `lists.yaml`,
 		playListSongsPerSlot: [24]string{
 			`a`, `b`, `c`, `d`, `e`, `f`,
 			`g`, `h`, `i`, `j`, `k`, `l`,
@@ -174,15 +177,16 @@ func (l Lists) save() error {
 // Returns a new Lists object, copy of the current Lists object.
 func (l Lists) copy() Lists {
 	var newL = Lists{
-		LabelContent:       l.LabelContent,
-		labelWidth:         l.labelWidth,
-		labelHeight:        l.labelHeight,
-		localDir:           l.localDir,
-		realLocalDir:       l.realLocalDir,
-		listsFile:          l.listsFile,
-		playListNumber:     l.playListNumber,
-		artworkDir:         l.artworkDir,
-		randomPlayListFile: l.randomPlayListFile,
+		LabelContentLeftSide:  l.LabelContentLeftSide,
+		LabelContentRightSide: l.LabelContentRightSide,
+		labelWidth:            l.labelWidth,
+		labelHeight:           l.labelHeight,
+		localDir:              l.localDir,
+		realLocalDir:          l.realLocalDir,
+		listsFile:             l.listsFile,
+		playListNumber:        l.playListNumber,
+		artworkDir:            l.artworkDir,
+		randomPlayListFile:    l.randomPlayListFile,
 	}
 
 	newL.RandomList = append(newL.RandomList, l.RandomList...)
@@ -395,16 +399,27 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 	} else {
 		newL.BrowseList = []string{}
 	}
-	newL.LabelContent = ``
-	labelContent := r.FormValue(`label_content`)
+	newL.LabelContentLeftSide = ``
+	labelContentLeftSide := r.FormValue(`label_content_left_side`)
 	for _, option := range l.labelContentOptions {
-		if labelContent == option && labelContent != l.LabelContent {
-			newL.LabelContent = labelContent
+		if labelContentLeftSide == option && labelContentLeftSide != l.LabelContentLeftSide {
+			newL.LabelContentLeftSide = labelContentLeftSide
 			changed = true
 		}
 	}
-	if newL.LabelContent == `` {
-		newL.LabelContent = l.LabelContent
+	if newL.LabelContentLeftSide == `` {
+		newL.LabelContentLeftSide = l.LabelContentLeftSide
+	}
+	newL.LabelContentRightSide = ``
+	labelContentRightSide := r.FormValue(`label_content_right_side`)
+	for _, option := range l.labelContentOptions {
+		if labelContentRightSide == option && labelContentRightSide != l.LabelContentRightSide {
+			newL.LabelContentRightSide = labelContentRightSide
+			changed = true
+		}
+	}
+	if newL.LabelContentRightSide == `` {
+		newL.LabelContentRightSide = l.LabelContentRightSide
 	}
 
 	if changed {
@@ -589,7 +604,7 @@ func (l *Lists) artwork(slot, key string, song *Song) (changed bool) {
 		logger.queue <- fmt.Sprint(err)
 		return
 	}
-	thumb = imaging.Resize(thumb, 96, 0, imaging.NearestNeighbor)
+	thumb = imaging.Resize(thumb, 96, 0, imaging.Box)
 	err = imaging.Save(thumb, thumbFileName+`.`+pic.Ext)
 	if err != nil {
 		logger.queue <- fmt.Sprint(err)

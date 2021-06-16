@@ -990,4 +990,5 @@ browse_list:
 - VA-FLAC
 - Blues
 - World Music/VA-FLAC
-label_content: name-left-author-left
+label_content_left_side: name-left-author-left
+label_content_right_side: name-right-author-right

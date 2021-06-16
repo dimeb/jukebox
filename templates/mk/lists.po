@@ -43,6 +43,12 @@ msgstr "Избриши ја песната"
 msgid "Label format"
 msgstr "Формат на етикетата"
 
+msgid "Left side"
+msgstr "Лева страна"
+
+msgid "Right side"
+msgstr "Десна страна"
+
 msgid "Name author"
 msgstr "<span>Име на песната</span><br><span>Автор на песната</span>"
 
