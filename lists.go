@@ -339,6 +339,7 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 	randomListChanged := false
 	playListChanged := false
 	browseListChanged := false
+	labelContentChanged := false
 	if len(r.Form[`random_list`]) > 0 {
 		newL.RandomList = append([]string{}, r.Form[`random_list`]...)
 		if strings.Join(newL.RandomList, ``) != strings.Join(l.RandomList, ``) {
@@ -405,6 +406,7 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 		if labelContentLeftSide == option && labelContentLeftSide != l.LabelContentLeftSide {
 			newL.LabelContentLeftSide = labelContentLeftSide
 			changed = true
+			labelContentChanged = true
 		}
 	}
 	if newL.LabelContentLeftSide == `` {
@@ -416,6 +418,7 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 		if labelContentRightSide == option && labelContentRightSide != l.LabelContentRightSide {
 			newL.LabelContentRightSide = labelContentRightSide
 			changed = true
+			labelContentChanged = true
 		}
 	}
 	if newL.LabelContentRightSide == `` {
@@ -431,7 +434,7 @@ func (l *Lists) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]
 				l.randomList()
 				jukebox.randomListChanged <- true
 			}
-			if playListChanged {
+			if playListChanged || labelContentChanged {
 				if userInterface.wsCanWrite {
 					userInterface.screenMessageChannel <- `init`
 				}
