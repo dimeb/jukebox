@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -56,6 +57,21 @@ func NewInternetRadio() *InternetRadio {
 	}()
 
 	return ir
+}
+
+// Check if radio URL is reachable.
+func (ir *InternetRadio) reachable() bool {
+	u, err := url.ParseRequestURI(cfg.InternetRadioSelectedURL)
+	if err != nil {
+		logger.queue <- fmt.Sprintf("Invalid internet radio URL: %s", cfg.InternetRadioSelectedURL)
+		return false
+	}
+	_, err = net.DialTimeout(`tcp`, u.Host, 3*time.Second)
+	if err != nil {
+		logger.queue <- fmt.Sprintf("Internet radio %s unreachable: %v", cfg.InternetRadioSelectedURL, err)
+		return false
+	}
+	return true
 }
 
 // Check tables.
