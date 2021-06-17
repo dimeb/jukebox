@@ -208,7 +208,7 @@ func (j *Jukebox) play() {
 				backgroundPlaying = true
 				s := ``
 				if cfg.BackgroundMusic == `internet radio` {
-					if cfg.InternetRadioSelectedURL != `` {
+					if cfg.InternetRadioSelectedURL != `` && internetRadio.reachable() {
 						internetRadioPlaying = true
 						s = "random off\nvolume " + j.setVolume(j.internetRadioVolume, 0) + "\nadd " + cfg.InternetRadioSelectedURL
 						logger.queue <- fmt.Sprintf("playing internet radio station %s", cfg.InternetRadioSelectedName)
