@@ -13,25 +13,18 @@ import (
 )
 
 type StreamingServices struct {
-	dbName       string
-	dbh          *sqlite3.Conn
-	mux          sync.Mutex
-	openDuration time.Duration
-	tickerOpen   *time.Ticker
+	dbName string
+	dbh    *sqlite3.Conn
+	mux    sync.Mutex
 }
 
 var streamingServices *StreamingServices
 
 // NewStreamingServices creates new Streaming structure.
 func NewStreamingServices() *StreamingServices {
-	ss := &StreamingServices{
-		dbName:       `streaming.db`,
-		openDuration: 30 * time.Second,
+	return &StreamingServices{
+		dbName: `streaming.db`,
 	}
-
-	go ss.open()
-
-	return ss
 }
 
 // Check tables.
@@ -73,7 +66,7 @@ func (ss *StreamingServices) checkTables(dbh *sqlite3.Conn) error {
 	})
 }
 
-func (ss *StreamingServices) openDB() bool {
+func (ss *StreamingServices) openDB() error {
 	var err error
 
 	// Check database file.
@@ -86,8 +79,7 @@ func (ss *StreamingServices) openDB() bool {
 			logger.queue <- fmt.Sprintf("streaming database name \"%s\": there is directory with same name", ss.dbName)
 			// Unconditionally delete directory if empty.
 			if err = os.Remove(ss.dbName); err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return false
+				return err
 			}
 			openFlags |= sqlite3.OPEN_CREATE
 		}
@@ -98,8 +90,7 @@ func (ss *StreamingServices) openDB() bool {
 	ss.dbh, err = sqlite3.Open(ss.dbName, openFlags)
 	ss.mux.Unlock()
 	if err != nil {
-		logger.queue <- fmt.Sprintf("%+v \"%s\"", err, ss.dbName)
-		return false
+		return err
 	}
 	ss.dbh.BusyTimeout(5 * time.Second)
 
@@ -107,8 +98,7 @@ func (ss *StreamingServices) openDB() bool {
 	if openFlags&sqlite3.OPEN_CREATE == 0 {
 		stmt, err := ss.dbh.Prepare(`PRAGMA integrity_check`)
 		if err != nil {
-			logger.queue <- fmt.Sprint(err)
-			return false
+			return err
 		}
 		row, err := stmt.Step()
 		if err == nil {
@@ -130,8 +120,7 @@ func (ss *StreamingServices) openDB() bool {
 			ss.closeDB()
 			// Remove database file and open it again.
 			if err = os.Remove(ss.dbName); err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return false
+				return err
 			}
 			logger.queue <- `recreating database`
 			openFlags |= sqlite3.OPEN_CREATE
@@ -139,8 +128,7 @@ func (ss *StreamingServices) openDB() bool {
 			ss.dbh, err = sqlite3.Open(ss.dbName, openFlags)
 			ss.mux.Unlock()
 			if err != nil {
-				logger.queue <- fmt.Sprintf("%+v \"%s\"", err, ss.dbName)
-				return false
+				return err
 			}
 			ss.dbh.BusyTimeout(5 * time.Second)
 		}
@@ -148,11 +136,10 @@ func (ss *StreamingServices) openDB() bool {
 
 	err = ss.checkTables(ss.dbh)
 	if err != nil {
-		logger.queue <- fmt.Sprint(err)
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
 func (ss *StreamingServices) closeDB() {
@@ -165,18 +152,6 @@ func (ss *StreamingServices) closeDB() {
 	ss.mux.Lock()
 	ss.dbh = nil
 	ss.mux.Unlock()
-}
-
-func (ss *StreamingServices) open() {
-	ss.tickerOpen = time.NewTicker(ss.openDuration)
-	defer ss.tickerOpen.Stop()
-	for ; true; <-ss.tickerOpen.C {
-		if ss.openDB() {
-			break
-		}
-		logger.queue <- `st.openDB() error`
-		ss.closeDB()
-	}
 }
 
 func (ss *StreamingServices) opened() bool {
@@ -219,17 +194,19 @@ func (ss *StreamingServices) updateFromWebAdmin(r *http.Request) (msgOK, msgErr 
 	}
 	if len(deleteFromDatabase) > 0 && ss.opened() {
 		cond := `('` + strings.Join(deleteFromDatabase, `','`) + `')`
-		stmtp, err := ss.dbh.Prepare(`SELECT url FROM playlist WHERE origin IN `+cond, 0)
+		qry := `SELECT url FROM playlist WHERE origin IN ` + cond + ` UNION ` +
+			`SELECT url FROM track WHERE playlist_id IN (SELECT playlist_id FROM playlist WHERE origin IN ` + cond + `)`
+		stmt, err := ss.dbh.Prepare(qry, 0)
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
 			return
 		}
-		defer stmtp.Close()
+		defer stmt.Close()
 		url := ``
 		urls := make(map[string]byte)
 		row := false
 		for {
-			row, err = stmtp.Step()
+			row, err = stmt.Step()
 			if err != nil {
 				logger.queue <- fmt.Sprint(err)
 				return
@@ -237,38 +214,20 @@ func (ss *StreamingServices) updateFromWebAdmin(r *http.Request) (msgOK, msgErr 
 			if !row {
 				break
 			}
-			err = stmtp.Scan(&url)
+			err = stmt.Scan(&url)
 			if err != nil {
 				logger.queue <- fmt.Sprint(err)
 				return
 			}
 			urls[url] = '1'
 		}
-		stmtt, err := ss.dbh.Prepare(`SELECT url FROM track WHERE playlist_id IN (SELECT playlist_id FROM playlist WHERE origin IN `+cond+`)`, 0)
-		if err != nil {
-			logger.queue <- fmt.Sprint(err)
+		if len(urls) == 0 {
 			return
-		}
-		defer stmtt.Close()
-		for {
-			row, err = stmtt.Step()
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return
-			}
-			if !row {
-				break
-			}
-			err = stmtt.Scan(&url)
-			if err != nil {
-				logger.queue <- fmt.Sprint(err)
-				return
-			}
-			urls[url] = '1'
 		}
 		err = ss.dbh.Exec(`DELETE FROM playlist WHERE origin IN ` + cond)
 		if err != nil {
 			logger.queue <- fmt.Sprint(err)
+			return
 		}
 		rl := []string{}
 		for _, v := range lists.RandomList {
@@ -276,11 +235,27 @@ func (ss *StreamingServices) updateFromWebAdmin(r *http.Request) (msgOK, msgErr 
 				rl = append(rl, v)
 			}
 		}
+		newL := lists.copy()
 		playListChanged := false
-		randomListChanged := len(rl) != len(lists.RandomList)
-		if playListChanged || randomListChanged {
-			newL := lists.copy()
+		randomListChanged := false
+		if len(rl) != len(lists.RandomList) {
 			newL.RandomList = append(newL.RandomList, rl...)
+			randomListChanged = true
+		}
+		for k, v := range newL.PlayList {
+			for k1, v1 := range v {
+				if _, ok := urls[v1.File]; ok {
+					song := Song{
+						File:   ``,
+						Name:   ``,
+						Author: ``,
+					}
+					newL.PlayList[k][k1] = song
+					playListChanged = true
+				}
+			}
+		}
+		if playListChanged || randomListChanged {
 			err = newL.save()
 			if err == nil {
 				err = lists.load()

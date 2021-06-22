@@ -95,8 +95,12 @@ func main() {
 		defer internetRadio.closeDB()
 
 		// Open streaming database.
-		//streamingServices = NewStreamingServices()
-		//defer streamingServices.closeDB()
+		streamingServices = NewStreamingServices()
+		err = streamingServices.openDB()
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+		defer streamingServices.closeDB()
 
 		// Start web administration.
 		webAdmin = NewWebAdmin()
