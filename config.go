@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Config configuration structure.
@@ -73,6 +73,8 @@ type Config struct {
 	Skin string `yaml:"skin,omitempty"`
 	// FreeSongsSelection free songs selectiion.
 	FreeSongsSelection byte `yaml:"free_songs_selection,omitempty"`
+	// StreamingServices streaming services configuration.
+	StreamingServices map[string]map[string]string `yaml:"streaming_services,omitempty"`
 	// Configuration file name.
 	cfgFile string
 	// Cookie name.
@@ -133,6 +135,14 @@ var (
 		TLSKeyFile:         `tls.key`,
 		Skin:               `default`,
 		FreeSongsSelection: 0,
+		StreamingServices: map[string]map[string]string{
+			`spotify`: {
+				`name`:   `Spotify`,
+				`id`:     ``,
+				`key`:    ``,
+				`active`: `0`,
+			},
+		},
 		cfgFile:            `jukebox.yaml`,
 		webAdminCookieName: `session_token`,
 		backgroundMusicSource: map[string]string{
@@ -212,6 +222,13 @@ func (cf Config) copy() Config {
 	newCf.selectionSourceTypes = make(map[string]string)
 	for k, v := range cf.selectionSourceTypes {
 		newCf.selectionSourceTypes[k] = v
+	}
+	for k, v := range cf.StreamingServices {
+		m := make(map[string]string)
+		for v1, v2 := range v {
+			m[v1] = v2
+		}
+		newCf.StreamingServices[k] = m
 	}
 
 	return newCf

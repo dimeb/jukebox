@@ -281,6 +281,8 @@ func (wa *WebAdmin) response(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(`Content-Type`, `text/plain`)
 		internetRadio.updateChannel <- internetRadio.updateForced
 		w.Write([]byte(`OK`))
+	case `streaming_services`:
+		wa.streamingServices(w, r)
 	case `config`:
 		wa.config(w, r)
 	case `skin`:
@@ -535,6 +537,58 @@ func (wa *WebAdmin) internetRadioSearch(w http.ResponseWriter, r *http.Request) 
 	}
 	w.Header().Set(`Content-Type`, `text/plain`)
 	http.Error(w, http.StatusText(status), status)
+}
+
+// Streaming services configuration.
+func (wa *WebAdmin) streamingServices(w http.ResponseWriter, r *http.Request) {
+	var (
+		ok        bool
+		languages map[string]int
+		tags      []string
+		countries map[string]string
+	)
+
+	sk := ``
+	sv := ``
+	info, err := os.Stat(internetRadio.dbSQLName)
+	if !os.IsNotExist(err) {
+		sk = `Last download`
+		sv = info.ModTime().Format(time.RFC1123)
+	}
+
+	if r.Method == `POST` {
+		err := r.ParseForm()
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+			wa.messageError[`Error saving data please try again`] = nil
+		} else {
+			// logger.queue <- fmt.Sprintf("%+v", r.Form)
+			wa.messageOK, wa.messageError = internetRadio.updateFromWebAdmin(r)
+		}
+	}
+
+	wa.stylesheets = append(wa.stylesheets, `tree_view.css`)
+
+	languages, tags, countries, ok = internetRadio.webAdminPage()
+	if !ok {
+		wa.messageError[`Internet radio database inaccessible`] = nil
+	}
+
+	wa.data = struct {
+		Cfg          *Config
+		Languages    map[string]int
+		Tags         []string
+		Countries    map[string]string
+		LastDownload string
+	}{
+		&cfg,
+		languages,
+		tags,
+		countries,
+		locale.GetD(wa.path, sk, sv),
+	}
+
+	wa.render(w)
 }
 
 // Application configuration.

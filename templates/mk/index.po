@@ -19,6 +19,9 @@ msgstr "Листи"
 msgid "Internet radio"
 msgstr "Интернет радио"
 
+msgid "Streaming services"
+msgstr "Стриминг сервиси"
+
 msgid "Setup"
 msgstr "Конфигурација"
 

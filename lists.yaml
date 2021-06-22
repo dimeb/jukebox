@@ -1,8 +1,8 @@
 random_list:
-- Rock
-- Pop
-- Reggae/BobMarley
-- Blues/LittleWalter
+  - Rock
+  - Pop
+  - Reggae/BobMarley
+  - Blues/LittleWalter
 play_list:
   "0":
     a:
@@ -987,8 +987,8 @@ show_play_list:
   "8": false
   "9": false
 browse_list:
-- VA-FLAC
-- Blues
-- World Music/VA-FLAC
+  - VA-FLAC
+  - Blues
+  - World Music/VA-FLAC
 label_content_left_side: name-left-author-left
 label_content_right_side: name-right-author-right

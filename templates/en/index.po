@@ -19,6 +19,9 @@ msgstr "Lists"
 msgid "Internet radio"
 msgstr "Internet radio"
 
+msgid "Streaming services"
+msgstr "Streaming services"
+
 msgid "Setup"
 msgstr "Configuration"
 

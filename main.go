@@ -94,6 +94,10 @@ func main() {
 		internetRadio = NewInternetRadio()
 		defer internetRadio.closeDB()
 
+		// Open streaming database.
+		//streamingServices = NewStreamingServices()
+		//defer streamingServices.closeDB()
+
 		// Start web administration.
 		webAdmin = NewWebAdmin()
 		webAdmin.action <- 'S'
