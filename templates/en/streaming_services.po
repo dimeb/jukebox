@@ -12,3 +12,6 @@ msgstr "Key or password"
 
 msgid "Active"
 msgstr "Active"
+
+msgid "Update"
+msgstr "Database update"

@@ -13,9 +13,10 @@ import (
 )
 
 type StreamingServices struct {
-	dbName string
-	dbh    *sqlite3.Conn
-	mux    sync.Mutex
+	dbName        string
+	dbh           *sqlite3.Conn
+	mux           sync.Mutex
+	updateChannel chan []string
 }
 
 var streamingServices *StreamingServices
@@ -23,7 +24,8 @@ var streamingServices *StreamingServices
 // NewStreamingServices creates new Streaming structure.
 func NewStreamingServices() *StreamingServices {
 	return &StreamingServices{
-		dbName: `streaming.db`,
+		dbName:        `streaming.db`,
+		updateChannel: make(chan []string, 10),
 	}
 }
 
@@ -58,7 +60,7 @@ func (ss *StreamingServices) checkTables(dbh *sqlite3.Conn) error {
 			`url TEXT,` +
 			`image_url TEXT,` +
 			`image_height NTEGER NOT NULL,` +
-			`image_width NTEGER NOT NULL` +
+			`image_width NTEGER NOT NULL,` +
 			`FOREIGN KEY(playlist_id) REFERENCES playlist(playlist_id)` +
 			`) WITHOUT ROWID;` +
 			`CREATE INDEX IF NOT EXISTS track_origin ON playlist (origin);` +

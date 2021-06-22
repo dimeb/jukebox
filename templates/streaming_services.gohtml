@@ -1,0 +1,56 @@
+{{define "streaming_services"}}
+<script>
+    var pageTitle = "{{.T.GetD `index` `Streaming services`}}";
+    var requestError = "{{.T.GetD `index` `Request error`}}";
+    var dbUpdateConfirm = "{{.T.GetD `index` `Are you sure`}}";
+    var dbUpdateRequestSent = "{{.T.GetD `index` `Request queued`}}";
+    var dbUpdateRequestError = "{{.T.GetD `index` `Request error`}}";
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+<form id="streaming-services-config-form" method="post" action="/streaming_services">
+{{range $k, $v := .Data.Cfg.StreamingServices}}
+<fieldset class="collapsible">
+    <legend><span>+</span><span>{{$v.name}}</span></legend>
+    <div class="row">
+        <div class="col c12">
+            <label for="{{$k}}-id">{{$.T.GetD `streaming_services` `ID`}}</label>
+            <input type="text" id="{{$k}}-id" class="autosize" name="{{$k}}-id" value="{{$v.id}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <label for="{{$k}}-key">{{$.T.GetD `streaming_services` `Key`}}</label>
+            <input type="text" id="{{$k}}-key" class="autosize" name="{{$k}}-key" value="{{$v.key}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <label for="{{$k}}-active">{{$.T.GetD `streaming_services` `Active`}}</label>
+            <input type="checkbox" id="{{$k}}-active" name="{{$k}}-active" {{if eq $v.active `1`}}checked{{end}} />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <div class="btn btn-sm" class="streaming-services-database-update" data-origin="{{$k}}">{{$.T.GetD `streaming_services` `Update`}}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <hr>
+        </div>
+    </div>
+</fieldset>
+{{end}}
+<div class="row">
+    <div class="col c12">
+        <input type="submit" class="btn btn-sm" id="streaming-services-submit" name="submit" value="{{.T.GetD `index` `Submit`}}" />
+    </div>
+</div>
+</form>
+<script src="/js/streaming_services.js?v={{.JSV}}"></script>
+{{end}}

@@ -12,3 +12,6 @@ msgstr "Клуч или лозинка"
 
 msgid "Active"
 msgstr "Активен"
+
+msgid "Update"
+msgstr "Ажурирај ја базата"
