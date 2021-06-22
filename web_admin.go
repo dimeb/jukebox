@@ -541,21 +541,6 @@ func (wa *WebAdmin) internetRadioSearch(w http.ResponseWriter, r *http.Request) 
 
 // Streaming services configuration.
 func (wa *WebAdmin) streamingServices(w http.ResponseWriter, r *http.Request) {
-	var (
-		ok        bool
-		languages map[string]int
-		tags      []string
-		countries map[string]string
-	)
-
-	sk := ``
-	sv := ``
-	info, err := os.Stat(internetRadio.dbSQLName)
-	if !os.IsNotExist(err) {
-		sk = `Last download`
-		sv = info.ModTime().Format(time.RFC1123)
-	}
-
 	if r.Method == `POST` {
 		err := r.ParseForm()
 		if err != nil {
@@ -563,29 +548,14 @@ func (wa *WebAdmin) streamingServices(w http.ResponseWriter, r *http.Request) {
 			wa.messageError[`Error saving data please try again`] = nil
 		} else {
 			// logger.queue <- fmt.Sprintf("%+v", r.Form)
-			wa.messageOK, wa.messageError = internetRadio.updateFromWebAdmin(r)
+			wa.messageOK, wa.messageError = streamingServices.updateFromWebAdmin(r)
 		}
 	}
 
-	wa.stylesheets = append(wa.stylesheets, `tree_view.css`)
-
-	languages, tags, countries, ok = internetRadio.webAdminPage()
-	if !ok {
-		wa.messageError[`Internet radio database inaccessible`] = nil
-	}
-
 	wa.data = struct {
-		Cfg          *Config
-		Languages    map[string]int
-		Tags         []string
-		Countries    map[string]string
-		LastDownload string
+		Cfg *Config
 	}{
 		&cfg,
-		languages,
-		tags,
-		countries,
-		locale.GetD(wa.path, sk, sv),
 	}
 
 	wa.render(w)

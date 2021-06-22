@@ -65,3 +65,8 @@ streaming_services:
     id: ""
     key: ""
     active: "0"
+  tidal:
+    name: Tidal
+    id: ""
+    key: ""
+    active: "0"

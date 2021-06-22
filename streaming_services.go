@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -35,7 +36,7 @@ func NewStreamingServices() *StreamingServices {
 
 // Check tables.
 func (ss *StreamingServices) checkTables(dbh *sqlite3.Conn) error {
-	if ss.dbh == nil {
+	if !ss.opened() {
 		return errors.New(`streaming database is closed`)
 	}
 
@@ -180,4 +181,124 @@ func (ss *StreamingServices) open() {
 
 func (ss *StreamingServices) opened() bool {
 	return ss.dbh != nil
+}
+
+// Updates configuration with values from web admin page.
+func (ss *StreamingServices) updateFromWebAdmin(r *http.Request) (msgOK, msgErr map[string][]interface{}) {
+	var err error = nil
+	msgOK = make(map[string][]interface{})
+	msgErr = make(map[string][]interface{})
+	newCfg := cfg.copy()
+	changed := false
+	deleteFromDatabase := []string{}
+	for k, v := range cfg.StreamingServices {
+		for v1, v2 := range v {
+			val := strings.TrimSpace(r.FormValue(k + `_` + v1))
+			if v2 != val {
+				if v1 == `active` && val == `` {
+					val = `0`
+				}
+				newCfg.StreamingServices[k][v1] = val
+				changed = true
+				if newCfg.StreamingServices[k][`active`] == `0` {
+					deleteFromDatabase = append(deleteFromDatabase, k)
+				}
+			}
+		}
+	}
+
+	if changed {
+		err = newCfg.save()
+		if err == nil {
+			cfg = newCfg.copy()
+			msgOK[`Configuration changed`] = nil
+		} else {
+			logger.queue <- fmt.Sprint(err)
+			msgErr[`Error saving data please try again`] = nil
+		}
+	}
+	if len(deleteFromDatabase) > 0 && ss.opened() {
+		cond := `('` + strings.Join(deleteFromDatabase, `','`) + `')`
+		stmtp, err := ss.dbh.Prepare(`SELECT url FROM playlist WHERE origin IN `+cond, 0)
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+			return
+		}
+		defer stmtp.Close()
+		url := ``
+		urls := make(map[string]byte)
+		row := false
+		for {
+			row, err = stmtp.Step()
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return
+			}
+			if !row {
+				break
+			}
+			err = stmtp.Scan(&url)
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return
+			}
+			urls[url] = '1'
+		}
+		stmtt, err := ss.dbh.Prepare(`SELECT url FROM track WHERE playlist_id IN (SELECT playlist_id FROM playlist WHERE origin IN `+cond+`)`, 0)
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+			return
+		}
+		defer stmtt.Close()
+		for {
+			row, err = stmtt.Step()
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return
+			}
+			if !row {
+				break
+			}
+			err = stmtt.Scan(&url)
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+				return
+			}
+			urls[url] = '1'
+		}
+		err = ss.dbh.Exec(`DELETE FROM playlist WHERE origin IN ` + cond)
+		if err != nil {
+			logger.queue <- fmt.Sprint(err)
+		}
+		rl := []string{}
+		for _, v := range lists.RandomList {
+			if _, ok := urls[v]; !ok {
+				rl = append(rl, v)
+			}
+		}
+		playListChanged := false
+		randomListChanged := len(rl) != len(lists.RandomList)
+		if playListChanged || randomListChanged {
+			newL := lists.copy()
+			newL.RandomList = append(newL.RandomList, rl...)
+			err = newL.save()
+			if err == nil {
+				err = lists.load()
+				if err == nil {
+					if randomListChanged {
+						lists.randomList()
+					}
+					if playListChanged {
+						if userInterface.wsCanWrite {
+							userInterface.screenMessageChannel <- `init`
+						}
+					}
+				}
+			}
+			if err != nil {
+				logger.queue <- fmt.Sprint(err)
+			}
+		}
+	}
+	return
 }
