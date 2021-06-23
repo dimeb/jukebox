@@ -93,9 +93,12 @@ func (j *Jukebox) play() {
 	go func() {
 		r := bufio.NewReader(stdout)
 		for {
-			s, _ := r.ReadString('\n')
-			// output <- s[:len(s)-1]
-			output <- string(s[2])
+			if s, err := r.ReadString('\n'); err == nil {
+				l := len(s)
+				if l > 1 {
+					output <- s[:l-1]
+				}
+			}
 		}
 	}()
 

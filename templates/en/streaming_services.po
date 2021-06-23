@@ -14,4 +14,4 @@ msgid "Active"
 msgstr "Active"
 
 msgid "Update"
-msgstr "Database update"
+msgstr "Lists update"

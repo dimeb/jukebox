@@ -14,4 +14,4 @@ msgid "Active"
 msgstr "Активен"
 
 msgid "Update"
-msgstr "Ажурирај ја базата"
+msgstr "Ажурирај ги листите"

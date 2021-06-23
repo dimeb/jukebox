@@ -156,6 +156,19 @@ func (ss *StreamingServices) closeDB() {
 	ss.mux.Unlock()
 }
 
+func (ss *StreamingServices) updateDB() {
+	origins := []string{}
+
+	for {
+		select {
+		case origins = <-ss.updateChannel:
+		}
+
+		if len(origins) > 0 && ss.opened() {
+		}
+	}
+}
+
 func (ss *StreamingServices) opened() bool {
 	return ss.dbh != nil
 }
