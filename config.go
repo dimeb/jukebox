@@ -137,10 +137,11 @@ var (
 		FreeSongsSelection: 0,
 		StreamingServices: map[string]map[string]string{
 			`spotify`: {
-				`name`:   `Spotify`,
-				`id`:     ``,
-				`key`:    ``,
-				`active`: `0`,
+				`name`:         `Spotify`,
+				`id`:           ``,
+				`secret`:       ``,
+				`redirect_uri`: ``,
+				`active`:       `0`,
 			},
 		},
 		cfgFile:            `jukebox.yaml`,
@@ -223,6 +224,7 @@ func (cf Config) copy() Config {
 	for k, v := range cf.selectionSourceTypes {
 		newCf.selectionSourceTypes[k] = v
 	}
+	newCf.StreamingServices = make(map[string]map[string]string)
 	for k, v := range cf.StreamingServices {
 		m := make(map[string]string)
 		for v1, v2 := range v {

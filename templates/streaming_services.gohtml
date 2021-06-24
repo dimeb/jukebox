@@ -24,8 +24,14 @@
     </div>
     <div class="row">
         <div class="col c12">
-            <label for="{{$k}}-key">{{$.T.GetD `streaming_services` `Key`}}</label>
-            <input type="text" id="{{$k}}-key" class="autosize" name="{{$k}}-key" value="{{$v.key}}" />
+            <label for="{{$k}}-secret">{{$.T.GetD `streaming_services` `Secret`}}</label>
+            <input type="text" id="{{$k}}-secret" class="autosize" name="{{$k}}-secret" value="{{$v.secret}}" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col c12">
+            <label for="{{$k}}-redirect-uri">{{$.T.GetD `streaming_services` `Redirect`}}</label>
+            <input type="text" id="{{$k}}-redirect-uri" class="autosize" name="{{$k}}-redirect_uri" value="{{$v.redirect_uri}}" />
         </div>
     </div>
     <div class="row">
@@ -36,7 +42,7 @@
     </div>
     <div class="row">
         <div class="col c12">
-            <div class="btn btn-sm" class="streaming-services-database-update" data-origin="{{$k}}">{{$.T.GetD `streaming_services` `Update`}}</div>
+            <div class="btn btn-sm" class="streaming-services-update" data-origin="{{$k}}">{{$.T.GetD `streaming_services` `Update`}}</div>
         </div>
     </div>
     <div class="row">

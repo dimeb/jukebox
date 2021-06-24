@@ -7,8 +7,11 @@ msgstr ""
 msgid "ID"
 msgstr "ID or username"
 
-msgid "Key"
-msgstr "Key or password"
+msgid "Secret"
+msgstr "Secret or password"
+
+msgid "Redirect"
+msgstr "Redirect URI"
 
 msgid "Active"
 msgstr "Active"

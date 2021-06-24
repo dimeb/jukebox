@@ -7,11 +7,14 @@ msgstr ""
 msgid "ID"
 msgstr "ID или корисничко име"
 
-msgid "Key"
+msgid "Secret"
 msgstr "Клуч или лозинка"
 
 msgid "Active"
 msgstr "Активен"
+
+msgid "Redirect"
+msgstr "Redirect URI"
 
 msgid "Update"
 msgstr "Ажурирај ги листите"

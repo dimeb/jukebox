@@ -76,8 +76,8 @@ func (ir *InternetRadio) reachable() bool {
 
 // Check tables.
 func (ir *InternetRadio) checkTables(dbh *sqlite3.Conn) error {
-	return ir.dbh.WithTx(func() error {
-		return ir.dbh.Exec(`CREATE TABLE IF NOT EXISTS station (` +
+	return dbh.WithTx(func() error {
+		return dbh.Exec(`CREATE TABLE IF NOT EXISTS station (` +
 			`station_id INTEGER PRIMARY KEY,` +
 			`name TEXT,` +
 			`url TEXT,` +

@@ -287,7 +287,9 @@ func (wa *WebAdmin) response(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(`Content-Type`, `text/plain`)
 		qry := r.URL.Query()
 		if v, ok := qry[`origin`]; ok {
-			streamingServices.updateChannel <- v
+			if len(v) > 0 {
+				streamingServices.updateChannel <- v[0]
+			}
 			w.Write([]byte(`OK`))
 		} else {
 			http.Error(w, `NOK`, http.StatusBadRequest)

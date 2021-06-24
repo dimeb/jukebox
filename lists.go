@@ -151,7 +151,11 @@ func (l *Lists) load() error {
 				}
 			}
 			if !ok {
-				pl[sl][s] = Song{}
+				pl[sl][s] = Song{
+					File:   ``,
+					Name:   ``,
+					Author: ``,
+				}
 				toSave = true
 			}
 		}

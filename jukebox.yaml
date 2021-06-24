@@ -63,10 +63,12 @@ streaming_services:
   spotify:
     name: Spotify
     id: ""
-    key: ""
+    secret: ""
+    redirect_uri: ""
     active: "0"
   tidal:
     name: Tidal
     id: ""
-    key: ""
+    secret: ""
+    redirect_uri: ""
     active: "0"

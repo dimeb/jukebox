@@ -96,11 +96,6 @@ func main() {
 
 		// Open streaming database.
 		streamingServices = NewStreamingServices()
-		err = streamingServices.openDB()
-		if err != nil {
-			logger.queue <- fmt.Sprint(err)
-		}
-		defer streamingServices.closeDB()
 
 		// Start web administration.
 		webAdmin = NewWebAdmin()

@@ -9,7 +9,7 @@ if (document.readyState !== 'loading') {
 }
 
 function streamingServicesInit() {
-    document.querySelectorAll('div.streaming-services-database-update').forEach(function (item) {
+    document.querySelectorAll('div.streaming-services-update').forEach(function (item) {
         item.addEventListener('click', function (event) {
             event.stopPropagation();
             if (window.confirm(dbUpdateConfirm)) {
