@@ -57,7 +57,7 @@ func (g *GPIO) chipMoneyBox(adaptor *raspi.Adaptor) {
 				logger.queue <- fmt.Sprint(err)
 				return
 			}
-			time.Sleep(time.Millisecond * (g.ChipMoneyPulseDuration / 2))
+			time.Sleep(time.Millisecond * time.Duration(g.ChipMoneyPulseDuration / 2))
 		}
 		// userInterface.chipOrMoneyInserted(m[`amount`], m[`songs`])
 	*/

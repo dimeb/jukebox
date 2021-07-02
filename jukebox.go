@@ -94,9 +94,8 @@ func (j *Jukebox) play() {
 		r := bufio.NewReader(stdout)
 		for {
 			if s, err := r.ReadString('\n'); err == nil {
-				l := len(s)
-				if l > 1 {
-					output <- s[:l-1]
+				if len(s) > 3 {
+					output <- string(s[2])
 				}
 			}
 		}
