@@ -9,8 +9,8 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/leonelquinteros/gotext v1.4.0
 	gobot.io/x/gobot v1.14.0
-	golang.org/x/crypto v0.0.0-20191001170739-f9e2070545dc
-	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/image v0.5.0 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
